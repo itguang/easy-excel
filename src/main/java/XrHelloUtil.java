@@ -4,8 +4,8 @@
  */
 public class XrHelloUtil {
 
-    public String hello() {
-        return "hello world!";
+    public void hello() {
+        System.out.println("hello from java");
     }
 
 }

@@ -1,7 +1,8 @@
 plugins {
     id 'java'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
+//    id 'org.jetbrains.kotlin.jvm' version '1.3.61'
     id 'maven'
+    id 'jacoco'
 }
 
 group 'com.xingren'
@@ -15,12 +16,16 @@ def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/
 
 repositories {
     mavenLocal()
+    maven {
+        url 'http://nexus.aihaisi.com/repository/public/'
+    }
+    maven {
+        url 'https://plugins.gradle.org/m2/'
+    }
+    jcenter()
     mavenCentral()
 
 }
-
-// 上传Task，Gradle会生成并上传pom.xml文件。
-
 
 // 发布 jar 包, 执行 gradle uploadArchives(或者 ./gradlew uploadArchives) 以发布 jar 包。
 uploadArchives {
@@ -41,15 +46,27 @@ uploadArchives {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+//    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    compile("com.xingren:vcommon:4.1.0")
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    compile group: 'org.apache.poi', name: 'poi', version: '4.1.1'
+
 }
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
+//compileKotlin {
+//    kotlinOptions {
+//        jvmTarget = "1.8"
+//    }
+//}
+//compileTestKotlin {
+//    kotlinOptions {
+//        jvmTarget = "1.8"
+//    }
+//}
+
+jacocoTestReport {
+    reports {
+        xml.enabled false
+        html.enabled true
     }
 }
-compileTestKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
+check.dependsOn jacocoTestReport

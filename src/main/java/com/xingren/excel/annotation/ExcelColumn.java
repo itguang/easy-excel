@@ -1,7 +1,7 @@
-package com.xingren.annotation;
+package com.xingren.excel.annotation;
 
-import com.xingren.converter.DefaultConverter;
-import com.xingren.converter.IConverter;
+import com.xingren.excel.converter.DefaultConverter;
+import com.xingren.excel.converter.IConverter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

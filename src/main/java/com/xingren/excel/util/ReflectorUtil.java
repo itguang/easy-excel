@@ -1,10 +1,13 @@
 package com.xingren.excel.util;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.ReflectPermission;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * 反射工具类,缓存读取的class信息,省的一直获取
@@ -49,7 +52,7 @@ public final class ReflectorUtil {
         Method[] methods = getClassMethods(cls);
         for (Method method : methods) {
             String name = method.getName();
-            //todo#guang 过滤出 所有以 is get set 开头 的方法名
+            // 过滤出 所有以 is get  开头 的方法名
             if (name.startsWith("get") && name.length() != 3) {
                 if (method.getParameterTypes().length == 0) {
                     name = methodToProperty(name);
@@ -386,4 +389,43 @@ public final class ReflectorUtil {
             throw new RuntimeException(e);
         }
     }
+
+    /**
+     * @return Map<String, String>
+     */
+    public Map<String, String> getEnumConstant() {
+
+
+        List<Method> getMethods = Stream.of(type.getDeclaredMethods())
+                .filter(method -> method.getName().startsWith("get"))
+                .collect(Collectors.toList());
+
+        Map<String, String> map = new HashMap<>(getMethods.size());
+        if (type.isEnum()) {
+            Object[] enumConstants = type.getEnumConstants();
+
+            for (Object obj : enumConstants) {
+
+                for (Method method : getMethods) {
+                    Object value = null;
+                    try {
+                        value = type.getMethod(method.getName()).invoke(obj);
+                        map.put(method.getName(), value.toString());
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    } catch (InvocationTargetException e) {
+                        e.printStackTrace();
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+            }
+
+        }
+
+        return map;
+
+    }
+
 }

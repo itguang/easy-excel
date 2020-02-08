@@ -1,21 +1,38 @@
 package com.xingren.excel.util;
 
-import com.xingren.excel.Fruit;
+import com.xingren.excel.Product;
+import com.xingren.excel.StateEnum;
+import com.xingren.excel.annotation.ExcelColumn;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 public class ReflectorUtilTest {
     ReflectorUtil reflectorUtil;
 
     @Before
     public void setUp() throws Exception {
-        reflectorUtil = ReflectorUtil.forClass(Fruit.class);
+        reflectorUtil = ReflectorUtil.forClass(Product.class);
+    }
+
+    @Test
+    public void testFilterExcelColumnField() {
+
+        List<Field> fieldList = reflectorUtil.getFieldList();
+
+        List<Field> excelColumnFields = fieldList.stream()
+                .filter(field -> field.isAnnotationPresent(ExcelColumn.class)
+                ).collect(Collectors.toList());
+
+        assertEquals(excelColumnFields.size(), fieldList.size() - 1);
+
     }
 
     @Test
@@ -39,6 +56,18 @@ public class ReflectorUtilTest {
         assertNotNull(setMethods.get("created"));
         assertNotNull(setMethods.get("name"));
         assertNull(setMethods.get("other"));
+
+    }
+
+    @Test
+    public void test_getEnumConstant() {
+        Map<String, String> enumConstant = ReflectorUtil.forClass(StateEnum.class).getEnumConstant();
+
+        enumConstant.forEach((methodName, value) -> {
+
+            System.out.println(methodName + "--" + value);
+
+        });
 
     }
 

@@ -24,15 +24,23 @@ import org.apache.poi.ss.usermodel.*;
  */
 public interface ExcelConstant {
 
+    String ANNO_COLUMN_NAME = "columnName";
+    String ANNO_INDEX = "index";
+    String ANNO_DATE_PATTERN = "datePattern";
+    String ANNO_ENMUKEY = "enumKey";
+    String ANNO_CONVERTER = "converter";
+    String ANNO_TRUE_STR = "trueToStr";
+    String ANNO_FALSE_STR = "falseToStr";
+    String ANNO_CENT_TO_YUAN = "centToYuan";
+    String ANNO_SUFFIX = "suffix";
+    String ANNO_PREFIX = "prefix";
+
     /**
      * The default worksheet name.
      */
-    String DEFAULT_SHEET_NAME   = "Sheet0";
-    String DEFAULT_FONT_NAME    = "SimHei";
-    int    DEFAULT_COLUMN_WIDTH = 20 * 256;
-
-    String XLSX_CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
-    String XLS_CONTENT_TYPE  = "application/vnd.ms-excel";
+    String DEFAULT_SHEET_NAME = "Sheet0";
+    String DEFAULT_FONT_NAME = "SimHei";
+    int DEFAULT_COLUMN_WIDTH = 20 * 256;
 
     static CellStyle defaultTitleStyle(Workbook workbook) {
         CellStyle style = workbook.createCellStyle();

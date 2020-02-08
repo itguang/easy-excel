@@ -2,18 +2,9 @@ package com.xingren.excel;
 
 public enum StateEnum {
 
-    /**
-     * 应收款批次未处理
-     */
-    NONE(0, "未处理"),
-    /**
-     * 应收款批次处理中
-     */
-    DOING(1, "处理中"),
-    /**
-     * 应收款批次处理已经完成
-     */
-    COMPLETED(2, "已完成");
+    UP(0, "上架"),
+    DOWN(1, "下架"),
+    NONE(2, "库存不足");
 
     StateEnum(int code, String name) {
         this.code = code;
@@ -29,4 +20,11 @@ public enum StateEnum {
      */
     private String name;
 
+    public int getCode() {
+        return code;
+    }
+
+    public String getName() {
+        return name;
+    }
 }

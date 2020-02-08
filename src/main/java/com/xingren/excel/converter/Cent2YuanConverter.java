@@ -1,0 +1,47 @@
+package com.xingren.excel.converter;
+
+import com.xingren.excel.ExcelConvertException;
+import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
+import com.xingren.excel.util.ReflectorUtil;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
+/**
+ * @author guang
+ * @since 2020/2/8 12:46 下午
+ */
+public class Cent2YuanConverter implements IConverter {
+    @Override
+    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
+
+        Class<?> type = entity.getField().getType();
+
+        Method getMethod = ReflectorUtil.forClass(clazz).getGetMethod(entity.getFiledName());
+        Object value = null;
+        try {
+            value = getMethod.invoke(rowData);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+
+        if (null == value) {
+            return 0;
+        }
+
+        if (Integer.class.equals(type)) {
+            double yuan = ((Integer) value).doubleValue() / 100;
+            return String.format("%.2f", yuan);
+
+        }
+        if (Long.class.equals(type)) {
+            double yuan = ((Long) value).doubleValue() / 100;
+            return String.format("%.2f", yuan);
+        }
+
+        throw new ExcelConvertException("只支持 Integer 和 Long 类型的 分转元操作");
+
+    }
+}

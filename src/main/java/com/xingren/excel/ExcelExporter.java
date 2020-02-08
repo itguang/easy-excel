@@ -1,6 +1,7 @@
 package com.xingren.excel;
 
 import com.xingren.excel.enums.ExcelType;
+import com.xingren.excel.exception.ExcelException;
 import com.xingren.excel.export.ExcelExportService;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.ReflectorUtil;

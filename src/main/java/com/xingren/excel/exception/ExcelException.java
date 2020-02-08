@@ -1,4 +1,4 @@
-package com.xingren.excel;
+package com.xingren.excel.exception;
 
 /**
  * @author guang

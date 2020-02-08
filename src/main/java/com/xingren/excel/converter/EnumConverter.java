@@ -1,6 +1,6 @@
 package com.xingren.excel.converter;
 
-import com.xingren.excel.ExcelConvertException;
+import com.xingren.excel.exception.ExcelConvertException;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.ReflectorUtil;
 

@@ -4,15 +4,15 @@ import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.exception.ExcelException;
 import com.xingren.excel.export.ExcelExportService;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
-import com.xingren.excel.util.ReflectorUtil;
-import lombok.SneakyThrows;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -25,7 +25,7 @@ import static com.xingren.excel.ExcelConstant.DEFAULT_SHEET_NAME;
  */
 public class ExcelExporter {
 
-    private static Workbook workbook = new HSSFWorkbook();
+    private static Workbook workbook;
 
     private static final ExcelType DEFAULT_EXCEL_TYPE = ExcelType.XLSX;
 
@@ -45,14 +45,11 @@ public class ExcelExporter {
     private String sheetHeader;
 
     /**
-     * 列头高度
-     */
-    private int columnTitleHeight = 20;
-
-    /**
      * Excel 文件类型
      */
     private ExcelType excelType = DEFAULT_EXCEL_TYPE;
+
+    private ExcelExportService excelExportService;
 
     private ExcelExporter() {
     }
@@ -73,66 +70,75 @@ public class ExcelExporter {
         }
 
         int rowIndex = 0;
+        excelExportService = ExcelExportService.forClass(clazz);
 
-        ReflectorUtil reflectorUtil = ReflectorUtil.forClass(clazz);
-        ExcelExportService excelExportService = new ExcelExportService();
-
-        // 生成一个表格
+        // 创建表格
         Sheet sheet = workbook.createSheet(sheetName);
+        sheet.autoSizeColumn(rowIndex);
 
-        // 设置表格头
+        // 创建表格头
         if (StringUtils.isNotEmpty(sheetHeader)) {
-            List<Field> excelField = excelExportService.filterExcelField(reflectorUtil.getFieldList());
-            if (CollectionUtils.isEmpty(excelField)) {
-                sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 0));
-            } else {
-                sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, excelField.size() - 1));
-            }
-            Row row0 = sheet.createRow(rowIndex);
-            Cell header = row0.createCell(0);
-            header.setCellValue(sheetHeader);
-            row0.setHeightInPoints(columnTitleHeight * 2);
+            excelExportService.createSheetHeader(workbook, rowIndex, sheetHeader, sheet);
             rowIndex = rowIndex + 1;
         }
 
-        //设置列标题
-        List<ExcelColumnAnnoEntity> annoEntities = excelExportService.getOrderedExcelColumnEntity(clazz);
+        // 创建列标题
+        List<ExcelColumnAnnoEntity> annoEntities = excelExportService.getOrderedExcelColumnEntity();
         if (CollectionUtils.isNotEmpty(annoEntities)) {
-            Row row = sheet.createRow(rowIndex);
-            for (int i = 0; i < annoEntities.size(); i++) {
-                row.createCell(i).setCellValue(annoEntities.get(i).getColumnName());
-                // 列标题高度
-                row.setHeightInPoints(columnTitleHeight);
-            }
+            createColumnTitle(rowIndex, sheet, annoEntities);
         }
 
-        // 设置 rows 数据
+        // 创建 rows
         for (Object rowData : rows) {
             Row row = sheet.createRow(++rowIndex);
-            for (int i = 0; i < annoEntities.size(); i++) {
-                ExcelColumnAnnoEntity entity = annoEntities.get(i);
-                Object value = excelExportService.parseFieldValue(clazz, rowData, entity);
-                row.createCell(i).setCellValue(value == null ? "" : value.toString());
-            }
+            insertRowData(annoEntities, rowData, row);
+            row.setRowStyle(ExcelConstant.defaultColumnStyle(workbook));
         }
 
         workbook.setActiveSheet(activeSheet);
         return workbook;
     }
 
-    @SneakyThrows
+    private void insertRowData(List<ExcelColumnAnnoEntity> annoEntities,
+                               Object rowData, Row row) {
+        for (int i = 0; i < annoEntities.size(); i++) {
+            ExcelColumnAnnoEntity entity = annoEntities.get(i);
+            Object value = excelExportService.parseFieldValue(rowData, entity);
+            row.createCell(i).setCellValue(value == null ? "" : value.toString());
+        }
+    }
+
+    /**
+     * 创建 ColumnTitle 并设置宽度自适应
+     */
+    private void createColumnTitle(int rowIndex, Sheet sheet, List<ExcelColumnAnnoEntity> annoEntities) {
+        Row row = sheet.createRow(rowIndex);
+        for (int columnNum = 0; columnNum < annoEntities.size(); columnNum++) {
+            int columnWidth = sheet.getColumnWidth(columnNum) / 256;
+            Cell currentCell = row.createCell(columnNum);
+            currentCell.setCellValue(annoEntities.get(columnNum).getColumnName());
+            int length = currentCell.getStringCellValue().getBytes().length;
+            if (columnWidth < length) {
+                columnWidth = length;
+            }
+            sheet.setColumnWidth(columnNum, columnWidth * 256);
+        }
+        row.setRowStyle(ExcelConstant.defaultRowTitleStyle(workbook));
+        row.setHeightInPoints(ExcelConstant.columnTitleHeight);
+    }
+
     public static ExcelExporter create(ExcelType excelType) {
-        if (ExcelType.XLSX.equals(excelType)) {
-            workbook = WorkbookFactory.create(true);
+        if (ExcelType.XLS.equals(excelType)) {
+            workbook = new HSSFWorkbook();
         } else {
-            workbook = WorkbookFactory.create(false);
+            workbook = new XSSFWorkbook();
         }
 
         return new ExcelExporter();
     }
 
     public static ExcelExporter create() {
-        return new ExcelExporter();
+        return create(ExcelType.XLSX);
     }
 
     public ExcelExporter sheetName(String sheetName) {
@@ -151,7 +157,7 @@ public class ExcelExporter {
         return this;
     }
 
-    public ExcelExporter sheetheader(String sheetHeader) {
+    public ExcelExporter sheetHeader(String sheetHeader) {
         if (StringUtils.isEmpty(sheetHeader)) {
             throw new ExcelException("sheetHeader 不能为空");
         }

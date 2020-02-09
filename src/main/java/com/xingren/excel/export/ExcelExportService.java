@@ -1,9 +1,16 @@
 package com.xingren.excel.export;
 
+import com.xingren.excel.ExcelConstant;
 import com.xingren.excel.annotation.ExcelColumn;
 import com.xingren.excel.converter.*;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.ReflectorUtil;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.Field;
@@ -22,9 +29,22 @@ import static com.xingren.excel.ExcelConstant.*;
  */
 public class ExcelExportService {
 
-    public Object parseFieldValue(Class<?> clazz, Object rowData, ExcelColumnAnnoEntity entity) {
+    private ReflectorUtil reflectorUtil;
+
+    private Class clazz;
+
+    private ExcelExportService(Class clazz) {
+        this.clazz = clazz;
+        this.reflectorUtil = ReflectorUtil.forClass(clazz);
+    }
+
+    public static ExcelExportService forClass(Class clazz) {
+        return new ExcelExportService(clazz);
+    }
+
+    public Object parseFieldValue(Object rowData, ExcelColumnAnnoEntity entity) {
         String filedName = entity.getFiledName();
-        Method getMethod = ReflectorUtil.forClass(clazz).getGetMethod(filedName);
+        Method getMethod = reflectorUtil.getGetMethod(filedName);
         Class<?> type = entity.getField().getType();
 
         if (null != entity.getConverter()) {
@@ -72,12 +92,10 @@ public class ExcelExportService {
 
     /**
      * 获取排序好的 注解实体 ExcelColumnAnnoEntity
-     *
-     * @param clazz
      */
-    public List<ExcelColumnAnnoEntity> getOrderedExcelColumnEntity(Class<?> clazz) {
+    public List<ExcelColumnAnnoEntity> getOrderedExcelColumnEntity() {
         List<ExcelColumnAnnoEntity> annoEntities =
-                filterExcelField(ReflectorUtil.forClass(clazz).getFieldList()).stream()
+                filterExcelField(reflectorUtil.getFieldList()).stream()
                         .map(field -> {
                             ExcelColumnAnnoEntity annoEntity = new ExcelColumnAnnoEntity();
                             annoEntity.setField(field);
@@ -126,6 +144,20 @@ public class ExcelExportService {
                 .filter(field -> field.isAnnotationPresent(ExcelColumn.class)
                 ).collect(Collectors.toList());
         return excelColumnFields;
+    }
+
+    public void createSheetHeader(Workbook workbook, int rowIndex, String sheetHeader, Sheet sheet) {
+        List<Field> excelField = filterExcelField(reflectorUtil.getFieldList());
+        if (CollectionUtils.isEmpty(excelField)) {
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 0));
+        } else {
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, excelField.size() - 1));
+        }
+        Row row0 = sheet.createRow(rowIndex);
+        Cell header = row0.createCell(0);
+        header.setCellValue(sheetHeader);
+        header.setCellStyle(ExcelConstant.defaultHeaderStyle(workbook));
+        row0.setHeightInPoints(sheetHeaderHeight);
     }
 
 }

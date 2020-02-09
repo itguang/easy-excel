@@ -29,7 +29,7 @@ public class ExcelExporterTest {
         // 获取桌面路径
         FileSystemView fsv = FileSystemView.getFileSystemView();
         String desktop = fsv.getHomeDirectory().getPath();
-        desktopFile = desktop + "/product.xls";
+        desktopFile = desktop + "/product.xlsx";
 
         String testResourcesPath = ExcelExporterTest.class.getResource("/").getPath();
         Product apple = new Product(1000,
@@ -50,9 +50,9 @@ public class ExcelExporterTest {
     @Test
     public void testExport() throws IOException {
 
-        Workbook workbook = ExcelExporter.create()
+        Workbook workbook = ExcelExporter.create(ExcelType.XLSX)
                 .sheetName("商品数据")
-                .sheetheader("--2月份商品数据--")
+                .sheetHeader("--2月份商品数据--")
                 .export(products, Product.class);
 
         File file = new File(desktopFile);
@@ -64,8 +64,8 @@ public class ExcelExporterTest {
 
     @Test
     public void testGetExcelRowNames() {
-        ExcelExportService excelExportService = new ExcelExportService();
-        List<ExcelColumnAnnoEntity> excelRowNames = excelExportService.getOrderedExcelColumnEntity(Product.class);
+        ExcelExportService excelExportService = ExcelExportService.forClass(Product.class);
+        List<ExcelColumnAnnoEntity> excelRowNames = excelExportService.getOrderedExcelColumnEntity();
 
         excelRowNames.forEach(entity -> {
             String columnName = entity.getColumnName();
@@ -74,16 +74,24 @@ public class ExcelExporterTest {
             }
             if ("价格".equals(columnName)) {
                 assertTrue(entity.getIndex().equals(20));
+                assertTrue(entity.getSuffix().equals(" 元"));
+                assertTrue(entity.getCentToYuan().equals(true));
             }
             if ("名称".equals(columnName)) {
                 assertTrue(entity.getIndex().equals(40));
             }
             if ("订单状态".equals(columnName)) {
                 assertTrue(entity.getIndex().equals(50));
-                assertTrue(entity.getEnumKey().equals("code"));
+                assertTrue(entity.getEnumKey().equals("name"));
+                assertTrue(entity.getPrefix().equals("状态: "));
             }
             if ("创建日期".equals(columnName)) {
                 assertTrue(entity.getIndex().equals(60));
+            }
+            if ("是否是新品".equals(columnName)) {
+                assertTrue(entity.getIndex().equals(41));
+                assertTrue(entity.getTrueStr().equals("新品"));
+                assertTrue(entity.getFalseStr().equals("非新品"));
             }
         });
 
@@ -116,7 +124,7 @@ public class ExcelExporterTest {
     @Test
     public void testSheetHeader() {
         String sheetHeader = "测试 sheet header";
-        ExcelExporter excelExporter = ExcelExporter.create(ExcelType.XLSX).sheetheader(sheetHeader);
+        ExcelExporter excelExporter = ExcelExporter.create(ExcelType.XLSX).sheetHeader(sheetHeader);
         assertTrue(excelExporter.getSheetHeader().equals(sheetHeader));
     }
 

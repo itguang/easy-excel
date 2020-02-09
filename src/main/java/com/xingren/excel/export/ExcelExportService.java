@@ -138,7 +138,7 @@ public class ExcelExportService {
         return annoEntities;
     }
 
-    public List<Field> filterExcelField(List<Field> fieldList) {
+    private List<Field> filterExcelField(List<Field> fieldList) {
         // 过滤出 注解 @ExcelColumn 的字段
         List<Field> excelColumnFields = fieldList.stream()
                 .filter(field -> field.isAnnotationPresent(ExcelColumn.class)

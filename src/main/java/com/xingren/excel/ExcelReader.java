@@ -1,9 +1,9 @@
 package com.xingren.excel;
 
 import com.xingren.excel.enums.ExcelType;
-import com.xingren.excel.export.ExcelService;
 import com.xingren.excel.pojo.ColumnEntity;
 import com.xingren.excel.pojo.RowEntity;
+import com.xingren.excel.service.read.ExcelReadService;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -82,7 +82,7 @@ public class ExcelReader {
             }
             rowEntityList.add(new RowEntity(columnEntityList));
         }
-        rowDataList = ExcelService.forClass(clazz).parseRowEntity(rowEntityList);
+        rowDataList = ExcelReadService.forClass(clazz).parseRowEntity(rowEntityList);
 
         return rowDataList;
     }

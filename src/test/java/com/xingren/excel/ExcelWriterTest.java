@@ -1,8 +1,8 @@
 package com.xingren.excel;
 
 import com.xingren.excel.enums.ExcelType;
-import com.xingren.excel.export.ExcelService;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
+import com.xingren.excel.service.ExcelColumnService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
@@ -64,8 +64,8 @@ public class ExcelWriterTest {
 
     @Test
     public void testGetExcelRowNames() {
-        ExcelService excelService = ExcelService.forClass(Product.class);
-        List<ExcelColumnAnnoEntity> excelRowNames = excelService.getOrderedExcelColumnEntity();
+        List<ExcelColumnAnnoEntity> excelRowNames =
+                ExcelColumnService.forClass(Product.class).getOrderedExcelColumnEntity();
 
         excelRowNames.forEach(entity -> {
             String columnName = entity.getColumnName();

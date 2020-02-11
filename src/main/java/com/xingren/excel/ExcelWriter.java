@@ -2,7 +2,8 @@ package com.xingren.excel;
 
 import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.exception.ExcelException;
-import com.xingren.excel.export.ExcelService;
+import com.xingren.excel.service.ExcelColumnService;
+import com.xingren.excel.service.write.ExcelWriteService;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -48,7 +49,7 @@ public class ExcelWriter {
      */
     private ExcelType excelType = DEFAULT_EXCEL_TYPE;
 
-    private ExcelService excelService;
+    private ExcelWriteService excelWriteService;
 
     private ExcelWriter() {
     }
@@ -69,7 +70,7 @@ public class ExcelWriter {
         }
 
         int rowIndex = 0;
-        excelService = ExcelService.forClass(clazz);
+        excelWriteService = ExcelWriteService.forClass(clazz);
 
         // 创建表格
         Sheet sheet = workbook.createSheet(sheetName);
@@ -77,12 +78,12 @@ public class ExcelWriter {
 
         // 创建表格头
         if (StringUtils.isNotEmpty(sheetHeader)) {
-            excelService.createSheetHeader(workbook, rowIndex, sheetHeader, sheet);
+            excelWriteService.createSheetHeader(workbook, rowIndex, sheetHeader, sheet);
             rowIndex = rowIndex + 1;
         }
 
         // 创建列标题
-        List<ExcelColumnAnnoEntity> annoEntities = excelService.getOrderedExcelColumnEntity();
+        List<ExcelColumnAnnoEntity> annoEntities = ExcelColumnService.forClass(clazz).getOrderedExcelColumnEntity();
         if (CollectionUtils.isNotEmpty(annoEntities)) {
             createColumnTitle(rowIndex, sheet, annoEntities);
         }
@@ -102,7 +103,7 @@ public class ExcelWriter {
                                Object rowData, Row row) {
         for (int i = 0; i < annoEntities.size(); i++) {
             ExcelColumnAnnoEntity entity = annoEntities.get(i);
-            Object value = excelService.parseFieldValue(rowData, entity);
+            Object value = excelWriteService.parseFieldValue(rowData, entity);
             row.createCell(i).setCellValue(value == null ? "" : value.toString());
         }
     }

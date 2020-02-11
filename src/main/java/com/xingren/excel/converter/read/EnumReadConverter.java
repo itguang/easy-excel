@@ -16,6 +16,7 @@ import java.util.stream.Stream;
  * @since 2020/2/11 2:44 下午
  */
 public class EnumReadConverter implements IReadConverter {
+    private static Map<Class, Map<String, Object>> classEnmuObj = new HashMap<>();
 
     @Override
     public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue) {
@@ -28,6 +29,9 @@ public class EnumReadConverter implements IReadConverter {
     }
 
     public Map<String, Object> getEnumConstant(Class<?> type) {
+        if (!classEnmuObj.isEmpty()) {
+            return classEnmuObj.get(type);
+        }
         List<Method> getMethods = Stream.of(type.getDeclaredMethods())
                 .filter(method -> method.getName().startsWith("get"))
                 .collect(Collectors.toList());
@@ -50,6 +54,7 @@ public class EnumReadConverter implements IReadConverter {
                 }
             }
         }
+        classEnmuObj.put(type, map);
         return map;
     }
 }

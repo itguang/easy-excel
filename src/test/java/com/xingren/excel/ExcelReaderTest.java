@@ -31,10 +31,20 @@ public class ExcelReaderTest {
     }
 
     @Test
-    public void testImport() throws FileNotFoundException {
+    public void testImportXls() throws FileNotFoundException {
         FileInputStream fileInputStream = new FileInputStream(productFile_Xls);
         List<Product> products = ExcelReader
                 .read(fileInputStream, ExcelType.XLS)
+                .startRowNum(1)
+                .to(Product.class);
+        Assert.assertNotNull(products);
+    }
+
+    @Test
+    public void testImportXlsx() throws FileNotFoundException {
+        FileInputStream fileInputStream = new FileInputStream(productFile_Xls);
+        List<Product> products = ExcelReader
+                .read(fileInputStream)
                 .startRowNum(1)
                 .to(Product.class);
         Assert.assertNotNull(products);

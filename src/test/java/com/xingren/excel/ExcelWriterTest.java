@@ -49,11 +49,26 @@ public class ExcelWriterTest {
 
     @Test
     public void testExport() throws IOException {
-
         Workbook workbook = ExcelWriter.create(ExcelType.XLS)
                 .sheetName("商品数据")
                 .sheetHeader("--2月份商品数据--")
                 .write(products, Product.class);
+
+        File file = new File(productFile);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+
+    }
+
+    @Test
+    public void testExportEmpty() throws IOException {
+        ArrayList<Product> emptyProducts = new ArrayList<>();
+        Workbook workbook = ExcelWriter.create(ExcelType.XLS)
+                .sheetName("空的商品数据")
+                .sheetHeader("--2月份商品数据--")
+                .activeSheet(0)
+                .write(emptyProducts, Product.class);
 
         File file = new File(productFile);
         OutputStream outputStream = new FileOutputStream(file);

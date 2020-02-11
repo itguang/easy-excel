@@ -2,7 +2,8 @@ package com.xingren.excel;
 
 import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.exception.ExcelException;
-import com.xingren.excel.export.ExcelExportService;
+import com.xingren.excel.service.ExcelColumnService;
+import com.xingren.excel.service.write.ExcelWriteService;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +14,6 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -23,7 +23,7 @@ import static com.xingren.excel.ExcelConstant.DEFAULT_SHEET_NAME;
  * @author guang
  * @since 2020/1/17 2:42 下午
  */
-public class ExcelExporter {
+public class ExcelWriter {
 
     private static Workbook workbook;
 
@@ -49,9 +49,9 @@ public class ExcelExporter {
      */
     private ExcelType excelType = DEFAULT_EXCEL_TYPE;
 
-    private ExcelExportService excelExportService;
+    private ExcelWriteService excelWriteService;
 
-    private ExcelExporter() {
+    private ExcelWriter() {
     }
 
     /**
@@ -61,7 +61,7 @@ public class ExcelExporter {
      * @param clazz java Entity Class
      * @return workBook
      */
-    public Workbook export(Collection<?> rows, Class<?> clazz) {
+    public <T> Workbook write(List<T> rows, Class<?> clazz) {
         if (CollectionUtils.isEmpty(rows)) {
             rows = Collections.emptyList();
         }
@@ -70,7 +70,7 @@ public class ExcelExporter {
         }
 
         int rowIndex = 0;
-        excelExportService = ExcelExportService.forClass(clazz);
+        excelWriteService = ExcelWriteService.forClass(clazz);
 
         // 创建表格
         Sheet sheet = workbook.createSheet(sheetName);
@@ -78,12 +78,12 @@ public class ExcelExporter {
 
         // 创建表格头
         if (StringUtils.isNotEmpty(sheetHeader)) {
-            excelExportService.createSheetHeader(workbook, rowIndex, sheetHeader, sheet);
+            excelWriteService.createSheetHeader(workbook, rowIndex, sheetHeader, sheet);
             rowIndex = rowIndex + 1;
         }
 
         // 创建列标题
-        List<ExcelColumnAnnoEntity> annoEntities = excelExportService.getOrderedExcelColumnEntity();
+        List<ExcelColumnAnnoEntity> annoEntities = ExcelColumnService.forClass(clazz).getOrderedExcelColumnEntity();
         if (CollectionUtils.isNotEmpty(annoEntities)) {
             createColumnTitle(rowIndex, sheet, annoEntities);
         }
@@ -103,7 +103,7 @@ public class ExcelExporter {
                                Object rowData, Row row) {
         for (int i = 0; i < annoEntities.size(); i++) {
             ExcelColumnAnnoEntity entity = annoEntities.get(i);
-            Object value = excelExportService.parseFieldValue(rowData, entity);
+            Object value = excelWriteService.parseFieldValue(rowData, entity);
             row.createCell(i).setCellValue(value == null ? "" : value.toString());
         }
     }
@@ -127,21 +127,21 @@ public class ExcelExporter {
         row.setHeightInPoints(ExcelConstant.columnTitleHeight);
     }
 
-    public static ExcelExporter create(ExcelType excelType) {
+    public static ExcelWriter create(ExcelType excelType) {
         if (ExcelType.XLS.equals(excelType)) {
             workbook = new HSSFWorkbook();
         } else {
             workbook = new XSSFWorkbook();
         }
 
-        return new ExcelExporter();
+        return new ExcelWriter();
     }
 
-    public static ExcelExporter create() {
+    public static ExcelWriter create() {
         return create(ExcelType.XLSX);
     }
 
-    public ExcelExporter sheetName(String sheetName) {
+    public ExcelWriter sheetName(String sheetName) {
         if (StringUtils.isEmpty(sheetName)) {
             throw new IllegalArgumentException("sheetName cannot be empty");
         }
@@ -149,7 +149,7 @@ public class ExcelExporter {
         return this;
     }
 
-    public ExcelExporter activeSheet(int activeSheet) {
+    public ExcelWriter activeSheet(int activeSheet) {
         if (activeSheet < 0) {
             activeSheet = 0;
         }
@@ -157,7 +157,7 @@ public class ExcelExporter {
         return this;
     }
 
-    public ExcelExporter sheetHeader(String sheetHeader) {
+    public ExcelWriter sheetHeader(String sheetHeader) {
         if (StringUtils.isEmpty(sheetHeader)) {
             throw new ExcelException("sheetHeader 不能为空");
         }

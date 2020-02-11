@@ -27,10 +27,14 @@ public interface ExcelConstant {
     String ANNO_INDEX = "index";
     String ANNO_DATE_PATTERN = "datePattern";
     String ANNO_ENMUKEY = "enumKey";
-    String ANNO_CONVERTER = "converter";
+    String ANNO_WRITE_CONVERTER = "writeConverter";
+    String ANNO_READ_CONVERTER = "readConverter";
     String ANNO_TRUE_STR = "trueToStr";
     String ANNO_FALSE_STR = "falseToStr";
+    String ANNO_STR_TO_TRUE = "strToTrue";
+    String ANNO_STR_TO_FALSE = "strToFalse";
     String ANNO_CENT_TO_YUAN = "centToYuan";
+    String ANNO_YUAN_TO_CENT = "yuanToCent";
     String ANNO_SUFFIX = "suffix";
     String ANNO_PREFIX = "prefix";
 

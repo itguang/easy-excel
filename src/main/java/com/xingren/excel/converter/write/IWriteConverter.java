@@ -1,11 +1,11 @@
-package com.xingren.excel.converter;
+package com.xingren.excel.converter.write;
 
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 
 /**
  * Excel 转换器
  */
-public interface IConverter {
+public interface IWriteConverter {
 
     /**
      * @param entity  Column 注解 实体

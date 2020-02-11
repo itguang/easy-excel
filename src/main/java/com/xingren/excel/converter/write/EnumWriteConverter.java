@@ -1,4 +1,4 @@
-package com.xingren.excel.converter;
+package com.xingren.excel.converter.write;
 
 import com.xingren.excel.exception.ExcelConvertException;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  * @author guang
  * @since 2020/2/8 11:35 上午
  */
-public class EnumConverter implements IConverter {
+public class EnumWriteConverter implements IWriteConverter {
 
     @Override
     public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {

@@ -1,8 +1,8 @@
 package com.xingren.excel;
 
 import com.xingren.excel.enums.ExcelType;
-import com.xingren.excel.export.ExcelExportService;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
+import com.xingren.excel.service.ExcelColumnService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
@@ -17,21 +17,21 @@ import java.util.List;
 
 import static org.junit.Assert.assertTrue;
 
-public class ExcelExporterTest {
+public class ExcelWriterTest {
 
     ArrayList<Product> products;
     String testResourcesPath;
-    String desktopFile;
+    String productFile;
 
     @Before
     public void before() throws FileNotFoundException {
 
         // 获取桌面路径
         FileSystemView fsv = FileSystemView.getFileSystemView();
-        String desktop = fsv.getHomeDirectory().getPath();
-        desktopFile = desktop + "/product.xlsx";
+        String user = fsv.getHomeDirectory().getPath();
+        productFile = user + "/product.xls";
 
-        String testResourcesPath = ExcelExporterTest.class.getResource("/").getPath();
+        String testResourcesPath = ExcelWriterTest.class.getResource("/").getPath();
         Product apple = new Product(1000,
                 1000L, OffsetDateTime.now(),
                 "苹果", true, StateEnum.DOWN, LocalDateTime.now(),
@@ -49,13 +49,28 @@ public class ExcelExporterTest {
 
     @Test
     public void testExport() throws IOException {
-
-        Workbook workbook = ExcelExporter.create(ExcelType.XLSX)
+        Workbook workbook = ExcelWriter.create(ExcelType.XLS)
                 .sheetName("商品数据")
                 .sheetHeader("--2月份商品数据--")
-                .export(products, Product.class);
+                .write(products, Product.class);
 
-        File file = new File(desktopFile);
+        File file = new File(productFile);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+
+    }
+
+    @Test
+    public void testExportEmpty() throws IOException {
+        ArrayList<Product> emptyProducts = new ArrayList<>();
+        Workbook workbook = ExcelWriter.create(ExcelType.XLS)
+                .sheetName("空的商品数据")
+                .sheetHeader("--2月份商品数据--")
+                .activeSheet(0)
+                .write(emptyProducts, Product.class);
+
+        File file = new File(productFile);
         OutputStream outputStream = new FileOutputStream(file);
         workbook.write(outputStream);
         outputStream.close();
@@ -64,8 +79,8 @@ public class ExcelExporterTest {
 
     @Test
     public void testGetExcelRowNames() {
-        ExcelExportService excelExportService = ExcelExportService.forClass(Product.class);
-        List<ExcelColumnAnnoEntity> excelRowNames = excelExportService.getOrderedExcelColumnEntity();
+        List<ExcelColumnAnnoEntity> excelRowNames =
+                ExcelColumnService.forClass(Product.class).getOrderedExcelColumnEntity();
 
         excelRowNames.forEach(entity -> {
             String columnName = entity.getColumnName();
@@ -100,32 +115,32 @@ public class ExcelExporterTest {
     @Test
     public void testSheetName() {
         String sheetName = "测试 sheet name";
-        ExcelExporter excelExporter = ExcelExporter.create(ExcelType.XLSX)
+        ExcelWriter excelWriter = ExcelWriter.create(ExcelType.XLSX)
                 .sheetName(sheetName);
-        assertTrue(excelExporter.getSheetName().equals(sheetName));
+        assertTrue(excelWriter.getSheetName().equals(sheetName));
     }
 
     @Test
     public void testDefaultSheetName() {
-        ExcelExporter excelExporter = ExcelExporter.create(ExcelType.XLSX);
-        assertTrue(ExcelConstant.DEFAULT_SHEET_NAME.equals(excelExporter.getSheetName()));
+        ExcelWriter excelWriter = ExcelWriter.create(ExcelType.XLSX);
+        assertTrue(ExcelConstant.DEFAULT_SHEET_NAME.equals(excelWriter.getSheetName()));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void testSheetNameIsEmpty() {
-        ExcelExporter.create(ExcelType.XLSX).sheetName(null);
+        ExcelWriter.create(ExcelType.XLSX).sheetName(null);
     }
 
     @Test
     public void testSheetHeaderIsEmpty() {
-        assertTrue(StringUtils.isEmpty(ExcelExporter.create(ExcelType.XLSX).getSheetHeader()));
+        assertTrue(StringUtils.isEmpty(ExcelWriter.create(ExcelType.XLSX).getSheetHeader()));
     }
 
     @Test
     public void testSheetHeader() {
         String sheetHeader = "测试 sheet header";
-        ExcelExporter excelExporter = ExcelExporter.create(ExcelType.XLSX).sheetHeader(sheetHeader);
-        assertTrue(excelExporter.getSheetHeader().equals(sheetHeader));
+        ExcelWriter excelWriter = ExcelWriter.create(ExcelType.XLSX).sheetHeader(sheetHeader);
+        assertTrue(excelWriter.getSheetHeader().equals(sheetHeader));
     }
 
 }

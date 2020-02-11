@@ -1,4 +1,4 @@
-package com.xingren.excel.converter;
+package com.xingren.excel.converter.write;
 
 import com.xingren.excel.exception.ExcelConvertException;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
@@ -11,7 +11,7 @@ import java.lang.reflect.Method;
  * @author guang
  * @since 2020/2/8 4:51 下午
  */
-public class BooleanConverter implements IConverter {
+public class BooleanWriteConverter implements IWriteConverter {
     @Override
     public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
 

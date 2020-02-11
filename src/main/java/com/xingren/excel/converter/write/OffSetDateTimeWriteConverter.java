@@ -1,4 +1,4 @@
-package com.xingren.excel.converter;
+package com.xingren.excel.converter.write;
 
 import com.xingren.excel.exception.ExcelConvertException;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
@@ -13,7 +13,7 @@ import java.time.OffsetDateTime;
  * @author guang
  * @since 2020/2/8 12:28 下午
  */
-public class OffSetDateTimeConverter implements IConverter {
+public class OffSetDateTimeWriteConverter implements IWriteConverter {
 
     @Override
     public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
@@ -32,7 +32,7 @@ public class OffSetDateTimeConverter implements IConverter {
             e.printStackTrace();
         }
 
-        return DateUtil.formatDateTime(offsetDateTime, entity.getDatePattern());
+        return DateUtil.formatOffsetDateTime(offsetDateTime, entity.getDatePattern());
 
     }
 }

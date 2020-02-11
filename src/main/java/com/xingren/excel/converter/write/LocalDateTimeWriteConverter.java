@@ -1,4 +1,4 @@
-package com.xingren.excel.converter;
+package com.xingren.excel.converter.write;
 
 import com.xingren.excel.exception.ExcelConvertException;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
  * @author guang
  * @since 2020/2/8 3:42 下午
  */
-public class LocalDateTimeConverter implements IConverter {
+public class LocalDateTimeWriteConverter implements IWriteConverter {
     @Override
     public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
 

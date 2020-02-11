@@ -1,9 +1,6 @@
 package com.xingren.excel.util;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.ReflectPermission;
+import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -390,42 +387,41 @@ public final class ReflectorUtil {
         }
     }
 
-    /**
-     * @return Map<String, String>
-     */
-    public Map<String, String> getEnumConstant() {
 
 
-        List<Method> getMethods = Stream.of(type.getDeclaredMethods())
-                .filter(method -> method.getName().startsWith("get"))
-                .collect(Collectors.toList());
-
-        Map<String, String> map = new HashMap<>(getMethods.size());
-        if (type.isEnum()) {
-            Object[] enumConstants = type.getEnumConstants();
-
-            for (Object obj : enumConstants) {
-
-                for (Method method : getMethods) {
-                    Object value = null;
-                    try {
-                        value = type.getMethod(method.getName()).invoke(obj);
-                        map.put(method.getName(), value.toString());
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    } catch (InvocationTargetException e) {
-                        e.printStackTrace();
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-            }
-
+    public static <T> T reflateInstance(Class<T> clazz) {
+        T newInstance = null;
+        try {
+            newInstance = (T) clazz.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
 
-        return map;
+        return newInstance;
+    }
 
+    public static <T> void invokeSetMethod(T rowObj, Method setMethod, Object setValue, Class<?> setClass) {
+        try {
+            // 反射调用 set 方法设置 属性值
+            if (setClass.isInstance(setValue)) {
+                setMethod.invoke(rowObj, setClass.cast(setValue));
+            } else {
+                throw new RuntimeException("类型不匹配! setValue= " + setValue + " ,setClass= " + setClass.getName());
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void makeAccessible(Method method) {
+        if ((!Modifier.isPublic(method.getModifiers()) || !Modifier.isPublic(method.getDeclaringClass().getModifiers())) &&
+                !method.isAccessible()) {
+            method.setAccessible(true);
+        }
     }
 
 }

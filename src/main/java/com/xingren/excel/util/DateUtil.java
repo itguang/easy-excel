@@ -7,10 +7,9 @@ package com.xingren.excel.util;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -28,7 +27,7 @@ public class DateUtil {
      * @param formatter
      * @return
      */
-    private static OffsetDateTime parse(CharSequence text, DateTimeFormatter formatter) {
+    private static OffsetDateTime parseToOffsetDateTime(CharSequence text, DateTimeFormatter formatter) {
         if (StringUtils.isEmpty(text) || formatter == null) {
             return null;
         }
@@ -44,7 +43,7 @@ public class DateUtil {
      * @param patten
      * @return
      */
-    public static String formatDateTime(OffsetDateTime dateTime, String patten) {
+    public static String formatOffsetDateTime(OffsetDateTime dateTime, String patten) {
         if (dateTime == null || StringUtils.isEmpty(patten)) {
             return null;
         }
@@ -86,6 +85,45 @@ public class DateUtil {
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return dateTime.format(formatter);
+    }
+
+    /**
+     * 根据字符串设置日期
+     *
+     * @param text
+     * @param datePattern
+     * @return
+     */
+    public static OffsetDateTime parseToOffsetDateTime(String text, String datePattern) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
+        Date date = null;
+        try {
+            date = simpleDateFormat.parse(text);
+            System.out.println(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Instant instant = date.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+
+        return OffsetDateTime.ofInstant(instant, zone);
+    }
+
+    public static LocalDateTime parseToLocalDateTime(String text, String datePattern) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
+        Date date = null;
+        try {
+            date = simpleDateFormat.parse(text);
+            System.out.println(date);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        Instant instant = date.toInstant();
+        ZoneId zone = ZoneId.systemDefault();
+        return LocalDateTime.ofInstant(instant, zone);
+
     }
 
 }

@@ -1,7 +1,6 @@
 package com.xingren.excel.util;
 
 import com.xingren.excel.Product;
-import com.xingren.excel.StateEnum;
 import com.xingren.excel.annotation.ExcelColumn;
 import org.junit.Before;
 import org.junit.Test;
@@ -59,16 +58,6 @@ public class ReflectorUtilTest {
 
     }
 
-    @Test
-    public void test_getEnumConstant() {
-        Map<String, String> enumConstant = ReflectorUtil.forClass(StateEnum.class).getEnumConstant();
 
-        enumConstant.forEach((methodName, value) -> {
-
-            System.out.println(methodName + "--" + value);
-
-        });
-
-    }
 
 }

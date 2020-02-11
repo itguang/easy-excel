@@ -1,6 +1,7 @@
 package com.xingren.excel;
 
 import com.xingren.excel.annotation.ExcelColumn;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -11,12 +12,13 @@ import java.time.OffsetDateTime;
  * @since 2020/1/18 10:32 上午
  */
 @Data
+@AllArgsConstructor
 public class Product {
 
     @ExcelColumn(columnName = "id", index = 10)
     private Integer id;
 
-    @ExcelColumn(columnName = "价格", index = 20, centToYuan = true, suffix = " 元")
+    @ExcelColumn(columnName = "价格", index = 20, centToYuan = true, suffix = " 元", yuanToCent = true)
     private Long price;
 
     @ExcelColumn(columnName = "创建日期", index = 60)
@@ -25,7 +27,8 @@ public class Product {
     @ExcelColumn(columnName = "名称", index = 40)
     private String name;
 
-    @ExcelColumn(columnName = "是否是新品", index = 41, trueToStr = "新品", falseToStr = "非新品")
+    @ExcelColumn(columnName = "是否是新品", index = 41, trueToStr = "新品", falseToStr = "非新品",
+            strToFalse = "非新品", strToTrue = "新品")
     private Boolean isNew;
 
     @ExcelColumn(columnName = "订单状态", index = 50, enumKey = "name", prefix = "状态: ")
@@ -37,41 +40,6 @@ public class Product {
     @ExcelColumn(columnName = "备注", index = 70)
     private String other;
 
-    public Product(Integer id, Long price, OffsetDateTime created, String name) {
-        this.id = id;
-        this.price = price;
-        this.created = created;
-        this.name = name;
-    }
-
-    public Product(Integer id, Long price, OffsetDateTime created, String name, StateEnum stateEnum) {
-        this.id = id;
-        this.price = price;
-        this.created = created;
-        this.name = name;
-        this.stateEnum = stateEnum;
-    }
-
-    public Product(Integer id, Long price, OffsetDateTime created, String name, StateEnum stateEnum,
-                   LocalDateTime updateTime, String other) {
-        this.id = id;
-        this.price = price;
-        this.created = created;
-        this.name = name;
-        this.stateEnum = stateEnum;
-        this.updateTime = updateTime;
-        this.other = other;
-    }
-
-    public Product(Integer id, Long price, OffsetDateTime created, String name, Boolean isNew, StateEnum stateEnum,
-                   LocalDateTime updateTime, String other) {
-        this.id = id;
-        this.price = price;
-        this.created = created;
-        this.name = name;
-        this.isNew = isNew;
-        this.stateEnum = stateEnum;
-        this.updateTime = updateTime;
-        this.other = other;
+    public Product() {
     }
 }

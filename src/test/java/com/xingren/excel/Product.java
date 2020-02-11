@@ -37,9 +37,11 @@ public class Product {
     @ExcelColumn(columnName = "状态变更日期", index = 55)
     private LocalDateTime updateTime;
 
-    @ExcelColumn(columnName = "备注", index = 70)
+    @ExcelColumn(columnName = "备注", index = 70, writeConverter = ToStringConverter.class, readConverter =
+            MyReadConverter.class)
     private String other;
 
+    // 导入必须有无参构造器
     public Product() {
     }
 }

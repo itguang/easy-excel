@@ -1,10 +1,10 @@
 package com.xingren.excel.util;
 
+import com.xingren.excel.exception.ExcelException;
+
 import java.lang.reflect.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * 反射工具类,缓存读取的class信息,省的一直获取
@@ -387,14 +387,13 @@ public final class ReflectorUtil {
         }
     }
 
-
-
     public static <T> T reflateInstance(Class<T> clazz) {
         T newInstance = null;
         try {
             newInstance = (T) clazz.newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
+            throw new ExcelException("类 " + clazz.toString() + " 必须得有无参构造器");
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }

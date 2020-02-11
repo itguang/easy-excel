@@ -32,9 +32,9 @@ public class ExcelReaderTest {
 
     @Test
     public void testImport() throws FileNotFoundException {
-        FileInputStream fileInputStream = new FileInputStream(productFile_Xlsx);
+        FileInputStream fileInputStream = new FileInputStream(productFile_Xls);
         List<Product> products = ExcelReader
-                .read(fileInputStream, ExcelType.XLSX)
+                .read(fileInputStream, ExcelType.XLS)
                 .startRowNum(1)
                 .to(Product.class);
         Assert.assertNotNull(products);

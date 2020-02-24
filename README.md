@@ -146,7 +146,7 @@ public class Product {
 
 导出表格:
 
-![image-20200211175532468](docs/imgs/image-20200211175532468.png)
+![33LRIA.png](https://s2.ax1x.com/2020/02/24/33LRIA.png)
 
 ## 导入
 

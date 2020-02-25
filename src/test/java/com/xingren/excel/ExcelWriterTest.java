@@ -1,5 +1,8 @@
 package com.xingren.excel;
 
+import com.xingren.excel.entity.Employee;
+import com.xingren.excel.entity.Product;
+import com.xingren.excel.entity.StateEnum;
 import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.service.ExcelColumnService;
@@ -8,8 +11,10 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.swing.filechooser.FileSystemView;
-import java.io.*;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -20,16 +25,21 @@ import static org.junit.Assert.assertTrue;
 public class ExcelWriterTest {
 
     ArrayList<Product> products;
-    String testResourcesPath;
-    String productFile;
+    String productFile_XLS;
+    String productFile_XLSX;
+    String productTemplate_XLSX;
+    String employeeTemplate_XLS;
 
     @Before
-    public void before() throws FileNotFoundException {
+    public void before() {
 
         // 获取桌面路径
-        FileSystemView fsv = FileSystemView.getFileSystemView();
-        String user = fsv.getHomeDirectory().getPath();
-        productFile = user + "/product.xls";
+        String resourcePath = this.getClass().getClassLoader().getResource("").getPath().replace("classes",
+                "resources");
+        productFile_XLS = resourcePath + "export/导出商品数据.xls";
+        productFile_XLSX = resourcePath + "export/导出商品数据.xlsx";
+        productTemplate_XLSX = resourcePath + "export/商品模板表.xlsx";
+        employeeTemplate_XLS = resourcePath + "export/员工模板表.xls";
 
         String testResourcesPath = ExcelWriterTest.class.getResource("/").getPath();
         Product apple = new Product(1000,
@@ -54,7 +64,37 @@ public class ExcelWriterTest {
                 .sheetHeader("--2月份商品数据--")
                 .write(products, Product.class);
 
-        File file = new File(productFile);
+        File file = new File(productFile_XLS);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+
+    }
+
+    @Test
+    public void testExportTemplate() throws IOException {
+        Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
+                .sheetName("商品模板表")
+                .sheetHeader("--商品数据--")
+                .activeSheet(0)
+                .writeTemplate(Product.class);
+
+        File file = new File(productTemplate_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+
+    }
+
+    @Test
+    public void testExportEmployeeTemplate() throws IOException {
+        Workbook workbook = ExcelWriter.create(ExcelType.XLS)
+                .sheetName("员工模板表")
+                .sheetHeader("--员工数据--")
+                .activeSheet(0)
+                .writeTemplate(Employee.class);
+
+        File file = new File(employeeTemplate_XLS);
         OutputStream outputStream = new FileOutputStream(file);
         workbook.write(outputStream);
         outputStream.close();
@@ -64,13 +104,13 @@ public class ExcelWriterTest {
     @Test
     public void testExportEmpty() throws IOException {
         ArrayList<Product> emptyProducts = new ArrayList<>();
-        Workbook workbook = ExcelWriter.create(ExcelType.XLS)
+        Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
                 .sheetName("空的商品数据")
                 .sheetHeader("--2月份商品数据--")
                 .activeSheet(0)
                 .write(emptyProducts, Product.class);
 
-        File file = new File(productFile);
+        File file = new File(productFile_XLSX);
         OutputStream outputStream = new FileOutputStream(file);
         workbook.write(outputStream);
         outputStream.close();

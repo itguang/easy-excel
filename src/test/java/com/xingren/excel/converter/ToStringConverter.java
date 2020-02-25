@@ -1,6 +1,7 @@
-package com.xingren.excel;
+package com.xingren.excel.converter;
 
 import com.xingren.excel.converter.write.IWriteConverter;
+import com.xingren.excel.entity.Product;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 
 /**

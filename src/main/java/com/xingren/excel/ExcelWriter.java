@@ -2,9 +2,9 @@ package com.xingren.excel;
 
 import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.exception.ExcelException;
+import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.service.ExcelColumnService;
 import com.xingren.excel.service.write.ExcelWriteService;
-import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -14,6 +14,7 @@ import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -52,6 +53,14 @@ public class ExcelWriter {
     private ExcelWriteService excelWriteService;
 
     private ExcelWriter() {
+    }
+
+    /**
+     * 导出模板
+     */
+    public <T> Workbook writeTemplate(Class<T> clazz) {
+        ArrayList<T> rowDatas = new ArrayList<>();
+        return write(rowDatas, clazz);
     }
 
     /**

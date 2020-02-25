@@ -1,6 +1,6 @@
 package com.xingren.excel.util;
 
-import com.xingren.excel.Product;
+import com.xingren.excel.entity.Product;
 import com.xingren.excel.annotation.ExcelColumn;
 import org.junit.Before;
 import org.junit.Test;

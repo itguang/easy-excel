@@ -7,6 +7,7 @@ package com.xingren.excel.util;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.*;
@@ -49,6 +50,11 @@ public class DateUtil {
         }
 
         return dateTime.format(DateTimeFormatter.ofPattern(patten));
+    }
+
+    public static String formatDate(Date time, String patten) {
+        DateFormat dateFormat = new SimpleDateFormat(patten);
+        return dateFormat.format(time);
     }
 
     /**
@@ -99,7 +105,6 @@ public class DateUtil {
         Date date = null;
         try {
             date = simpleDateFormat.parse(text);
-            System.out.println(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }

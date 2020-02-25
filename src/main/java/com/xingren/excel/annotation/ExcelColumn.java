@@ -10,6 +10,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+import static com.xingren.excel.ExcelConstant.DEFAULT_DATE_PATTREN;
+
 /**
  * @author guang
  */
@@ -30,7 +32,7 @@ public @interface ExcelColumn {
     /**
      * 日期格式
      */
-    String datePattern() default "yyyy/MM/dd";
+    String datePattern() default DEFAULT_DATE_PATTREN;
 
     /**
      * 枚举导入使用的key

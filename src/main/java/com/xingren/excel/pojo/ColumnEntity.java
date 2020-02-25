@@ -2,6 +2,7 @@ package com.xingren.excel.pojo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import org.apache.poi.ss.usermodel.Cell;
 
 /**
  * @author guang
@@ -10,6 +11,8 @@ import lombok.Data;
 @Data
 @AllArgsConstructor
 public class ColumnEntity {
+
+    private Cell cell;
 
     private String columnName;
 

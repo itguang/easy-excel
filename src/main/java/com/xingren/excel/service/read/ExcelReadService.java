@@ -9,6 +9,7 @@ import com.xingren.excel.util.DateUtil;
 import com.xingren.excel.util.ReflectorUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
+import org.apache.poi.ss.usermodel.Cell;
 
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
@@ -18,6 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.xingren.excel.ExcelConstant.DEFAULT_DATE_PATTREN;
+import static org.apache.poi.ss.usermodel.CellType.NUMERIC;
 
 /**
  * @author guang
@@ -102,15 +106,27 @@ public class ExcelReadService {
         }
         // OffsetDateTime 处理
         if (OffsetDateTime.class.equals(fieldType)) {
-            OffsetDateTime offsetDateTime = DateUtil.parseToOffsetDateTime(columnValue,
-                    annoEntity.getDatePattern());
-            invokeSetMethod(rowObj, setMethod, offsetDateTime, fieldType);
+            if (StringUtils.isNotEmpty(columnValue)) {
+                Cell cell = columnEntity.getCell();
+                OffsetDateTime offsetDateTime = null;
+                if (cell.getCellTypeEnum().equals(NUMERIC)) {
+                    offsetDateTime = DateUtil.parseToOffsetDateTime(columnValue, DEFAULT_DATE_PATTREN);
+                } else {
+                    offsetDateTime = DateUtil.parseToOffsetDateTime(columnValue, annoEntity.getDatePattern());
+                }
+                invokeSetMethod(rowObj, setMethod, offsetDateTime, fieldType);
+            }
             return;
         }
         // LocalDateTime 处理
         if (LocalDateTime.class.equals(fieldType)) {
-            LocalDateTime localDateTime = DateUtil.parseToLocalDateTime(columnValue,
-                    annoEntity.getDatePattern());
+            Cell cell = columnEntity.getCell();
+            LocalDateTime localDateTime = null;
+            if (cell.getCellTypeEnum().equals(NUMERIC)) {
+                localDateTime = DateUtil.parseToLocalDateTime(columnValue, DEFAULT_DATE_PATTREN);
+            } else {
+                localDateTime = DateUtil.parseToLocalDateTime(columnValue, annoEntity.getDatePattern());
+            }
             invokeSetMethod(rowObj, setMethod, localDateTime, fieldType);
         }
     }

@@ -4,10 +4,9 @@ import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.pojo.ColumnEntity;
 import com.xingren.excel.pojo.RowEntity;
 import com.xingren.excel.service.read.ExcelReadService;
+import com.xingren.excel.service.read.MyDataFormatter;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.IOException;
@@ -32,6 +31,8 @@ public class ExcelReader {
     private int sheetNum = 0;
 
     private Workbook workbook;
+
+    private DataFormatter formatter = new MyDataFormatter();
 
     private ExcelReader(InputStream inputStream, ExcelType excelType) {
         try {
@@ -76,8 +77,9 @@ public class ExcelReader {
             Row row = sheet.getRow(rowNum);
             for (int curCellNum = row.getFirstCellNum(); curCellNum < row.getLastCellNum(); curCellNum++) {
                 String columnName = columnNames[curCellNum];
-                String columnValue = row.getCell(curCellNum).getStringCellValue();
-                ColumnEntity columnEntity = new ColumnEntity(columnName, columnValue);
+                Cell cell = row.getCell(curCellNum);
+                String columnValue = formatter.formatCellValue(cell);
+                ColumnEntity columnEntity = new ColumnEntity(cell, columnName, columnValue);
                 columnEntityList.add(columnEntity);
             }
             rowEntityList.add(new RowEntity(columnEntityList));

@@ -1,13 +1,14 @@
 package com.xingren.excel;
 
+import com.xingren.excel.entity.Employee;
 import com.xingren.excel.enums.ExcelType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.swing.filechooser.FileSystemView;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.util.List;
 
 /**
@@ -16,38 +17,36 @@ import java.util.List;
  */
 public class ExcelReaderTest {
 
-    String productFile_Xlsx;
-    String productFile_Xls;
+    private String employeeFile_Xlsx;
+    private String employeeFile_Xls;
 
     @Before
-    public void before() throws FileNotFoundException {
-
-        // 获取桌面路径
-        FileSystemView fsv = FileSystemView.getFileSystemView();
-        String user = fsv.getHomeDirectory().getPath();
-        productFile_Xlsx = user + "/product.xlsx";
-        productFile_Xls = user + "/product.xls";
+    public void before() {
+        String resourcePath = this.getClass().getClassLoader().getResource("").getPath().replace("classes",
+                "resources");
+        employeeFile_Xls = resourcePath + "read/员工模板表.xls";
+        employeeFile_Xlsx = resourcePath + "read/员工模板表.xlsx";
 
     }
 
     @Test
     public void testImportXls() throws FileNotFoundException {
-        FileInputStream fileInputStream = new FileInputStream(productFile_Xls);
-        List<Product> products = ExcelReader
+        InputStream fileInputStream = new FileInputStream(employeeFile_Xls);
+        List<Employee> employees = ExcelReader
                 .read(fileInputStream, ExcelType.XLS)
                 .startRowNum(1)
-                .to(Product.class);
-        Assert.assertNotNull(products);
+                .to(Employee.class);
+        Assert.assertNotNull(employees);
     }
 
     @Test
     public void testImportXlsx() throws FileNotFoundException {
-        FileInputStream fileInputStream = new FileInputStream(productFile_Xls);
-        List<Product> products = ExcelReader
-                .read(fileInputStream)
+        InputStream fileInputStream = new FileInputStream(employeeFile_Xlsx);
+        List<Employee> employees = ExcelReader
+                .read(fileInputStream, ExcelType.XLSX)
                 .startRowNum(1)
-                .to(Product.class);
-        Assert.assertNotNull(products);
+                .to(Employee.class);
+        Assert.assertNotNull(employees);
     }
 
 }

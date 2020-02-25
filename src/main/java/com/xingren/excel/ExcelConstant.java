@@ -45,6 +45,8 @@ public interface ExcelConstant {
     String DEFAULT_FONT_NAME = "SimHei";
     int DEFAULT_COLUMN_WIDTH = 20 * 256;
 
+    String DEFAULT_DATE_PATTREN = "yyyy/MM/dd";
+
     /**
      * 列头高度
      */

@@ -1,6 +1,7 @@
-package com.xingren.excel;
+package com.xingren.excel.entity;
 
 import com.xingren.excel.annotation.ExcelColumn;
+import com.xingren.excel.converter.ToStringConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -18,7 +19,7 @@ public class Product {
     @ExcelColumn(columnName = "id", index = 10)
     private Integer id;
 
-    @ExcelColumn(columnName = "价格", index = 20, centToYuan = true, suffix = " 元", yuanToCent = true)
+    @ExcelColumn(columnName = "价格", index = 20, centToYuan = true, suffix = " 元")
     private Long price;
 
     @ExcelColumn(columnName = "创建日期", index = 60)
@@ -27,8 +28,7 @@ public class Product {
     @ExcelColumn(columnName = "名称", index = 40)
     private String name;
 
-    @ExcelColumn(columnName = "是否是新品", index = 41, trueToStr = "新品", falseToStr = "非新品",
-            strToFalse = "非新品", strToTrue = "新品")
+    @ExcelColumn(columnName = "是否是新品", index = 41, trueToStr = "新品", falseToStr = "非新品")
     private Boolean isNew;
 
     @ExcelColumn(columnName = "订单状态", index = 50, enumKey = "name", prefix = "状态: ")
@@ -37,8 +37,7 @@ public class Product {
     @ExcelColumn(columnName = "状态变更日期", index = 55)
     private LocalDateTime updateTime;
 
-    @ExcelColumn(columnName = "备注", index = 70, writeConverter = ToStringConverter.class, readConverter =
-            MyReadConverter.class)
+    @ExcelColumn(columnName = "备注", index = 70, writeConverter = ToStringConverter.class)
     private String other;
 
     // 导入必须有无参构造器

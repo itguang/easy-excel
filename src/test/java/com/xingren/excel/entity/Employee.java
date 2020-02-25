@@ -16,10 +16,10 @@ public class Employee {
     private Integer id;
     @ExcelColumn(index = 20, columnName = "名称")
     private String name;
-    @ExcelColumn(index = 30, columnName = "工资", centToYuan = true)
+    @ExcelColumn(index = 30, columnName = "工资", yuanToCent = true, suffix = " 元")
     private Long salary;
     @ExcelColumn(index = 40, columnName = "性别")
     private Gender gender;
-    @ExcelColumn(index = 50, columnName = "生日",datePattern = "yyyy-MM-dd")
+    @ExcelColumn(index = 50, columnName = "生日")
     private OffsetDateTime birthday;
 }

@@ -1,7 +1,6 @@
 package com.xingren.excel.entity;
 
 import com.xingren.excel.annotation.ExcelColumn;
-import com.xingren.excel.converter.ToStringConverter;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -37,7 +36,7 @@ public class Product {
     @ExcelColumn(columnName = "状态变更日期", index = 55)
     private LocalDateTime updateTime;
 
-    @ExcelColumn(columnName = "备注", index = 70, writeConverter = ToStringConverter.class)
+    @ExcelColumn(columnName = "备注", index = 70)
     private String other;
 
     // 导入必须有无参构造器

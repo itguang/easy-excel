@@ -117,6 +117,35 @@ public class ExcelWriterTest {
 
     }
 
+    /**
+     * 10000 行数据导出测试 10s 需要优化
+     */
+    @Test
+    public void testExport_10k() throws IOException {
+
+        ArrayList<Product> products = new ArrayList<>();
+
+        for (int i = 0; i < 10000; i++) {
+            Product apple = new Product(i,
+                    1000L, OffsetDateTime.now(),
+                    "苹果" + i, true, StateEnum.DOWN, LocalDateTime.now(),
+                    "好吃" + i);
+            products.add(apple);
+        }
+
+        Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
+                .sheetName("商品数据")
+                .sheetHeader("--2月份商品数据--")
+                .activeSheet(0)
+                .write(products, Product.class);
+
+        File file = new File(productFile_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+
+    }
+
     @Test
     public void testGetExcelRowNames() {
         List<ExcelColumnAnnoEntity> excelRowNames =

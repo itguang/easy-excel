@@ -1,6 +1,7 @@
 package com.xingren.excel;
 
 import com.xingren.excel.entity.Employee;
+import com.xingren.excel.entity.Gender;
 import com.xingren.excel.entity.Product;
 import com.xingren.excel.entity.StateEnum;
 import com.xingren.excel.enums.ExcelType;
@@ -28,20 +29,19 @@ public class ExcelWriterTest {
     String productFile_XLS;
     String productFile_XLSX;
     String productTemplate_XLSX;
-    String employeeTemplate_XLS;
+    String employeeTemplate_XLSX;
 
     @Before
     public void before() {
 
-        // 获取桌面路径
+        // 导出文件路径 out/resources/export/ 文件下
         String resourcePath = this.getClass().getClassLoader().getResource("").getPath().replace("classes",
                 "resources");
         productFile_XLS = resourcePath + "export/导出商品数据.xls";
         productFile_XLSX = resourcePath + "export/导出商品数据.xlsx";
         productTemplate_XLSX = resourcePath + "export/商品模板表.xlsx";
-        employeeTemplate_XLS = resourcePath + "export/员工模板表.xls";
+        employeeTemplate_XLSX = resourcePath + "export/员工模板表.xlsx";
 
-        String testResourcesPath = ExcelWriterTest.class.getResource("/").getPath();
         Product apple = new Product(1000,
                 1000L, OffsetDateTime.now(),
                 "苹果", true, StateEnum.DOWN, LocalDateTime.now(),
@@ -88,13 +88,35 @@ public class ExcelWriterTest {
 
     @Test
     public void testExportEmployeeTemplate() throws IOException {
-        Workbook workbook = ExcelWriter.create(ExcelType.XLS)
+        Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
                 .sheetName("员工模板表")
                 .sheetHeader("--员工数据--")
                 .activeSheet(0)
                 .writeTemplate(Employee.class);
 
-        File file = new File(employeeTemplate_XLS);
+        File file = new File(employeeTemplate_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+
+    }
+
+    @Test
+    public void testExportEmployee() throws IOException {
+
+        ArrayList<Employee> employees = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            Employee employee = new Employee(i, "李" + i, 100L + i, Gender.MALE, OffsetDateTime.now().minusDays(i));
+            employees.add(employee);
+        }
+
+        Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
+                .sheetName("员工模板表")
+                .sheetHeader("--员工数据--")
+                .activeSheet(0)
+                .write(employees,Employee.class);
+
+        File file = new File(employeeTemplate_XLSX);
         OutputStream outputStream = new FileOutputStream(file);
         workbook.write(outputStream);
         outputStream.close();

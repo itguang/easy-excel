@@ -13,8 +13,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.xingren.excel.ExcelConstant.DEFAULT_SHEET_NAME;
 import static com.xingren.excel.ExcelConstant.columnDataRowHeight;
@@ -25,7 +26,11 @@ import static com.xingren.excel.ExcelConstant.columnDataRowHeight;
  */
 public class ExcelWriter {
 
-    HashMap<String, CellStyle> cacheStyle = new HashMap();
+    /**
+     * CellStyle 创建数量有限,保证并发安全
+     */
+    Map<String, CellStyle> cacheStyle = new ConcurrentHashMap<>();
+
     private Workbook workbook;
 
     private static final ExcelType DEFAULT_EXCEL_TYPE = ExcelType.XLSX;

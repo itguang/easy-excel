@@ -37,7 +37,7 @@ public class ExcelWriterTest {
         String resourcePath = this.getClass().getClassLoader().getResource("").getPath().replace("classes",
                 "resources").replace("/out", "/src");
         productFile_XLS = resourcePath + "export/导出商品数据.xls";
-        productFile_XLSX = resourcePath + "export/导出商品数据.xlsx";
+        productFile_XLSX = resourcePath + "export/导出商品数据_1w.xlsx";
         productEmptyFile_XLSX = resourcePath + "export/空的商品数据.xlsx";
         employeeTemplate_XLSX = resourcePath + "export/员工模板表.xlsx";
 
@@ -102,7 +102,7 @@ public class ExcelWriterTest {
     }
 
     /**
-     * 10000 行数据导出测试 10s 需要优化
+     * 10000 行数据导出测试 8s 需要优化
      */
     @Test
     public void testExport_1w_xlsx() throws IOException {

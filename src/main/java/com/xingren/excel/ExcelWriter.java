@@ -13,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 
 import static com.xingren.excel.ExcelConstant.DEFAULT_SHEET_NAME;
@@ -24,6 +25,7 @@ import static com.xingren.excel.ExcelConstant.columnDataRowHeight;
  */
 public class ExcelWriter {
 
+    HashMap<String, CellStyle> cacheStyle = new HashMap();
     private Workbook workbook;
 
     private static final ExcelType DEFAULT_EXCEL_TYPE = ExcelType.XLSX;
@@ -106,10 +108,9 @@ public class ExcelWriter {
 
         // 创建 rows
         CellStyle style = ExcelConstant.defaultDataRowStyle(workbook);
-        CellStyle cellStyle = workbook.createCellStyle();
         for (Object rowData : rows) {
             Row row = sheet.createRow(++rowIndex);
-            insertRowData(annoEntities, rowData, row, cellStyle);
+            insertRowData(annoEntities, rowData, row);
             row.setRowStyle(style);
             row.setHeightInPoints(columnDataRowHeight);
         }
@@ -119,10 +120,19 @@ public class ExcelWriter {
     }
 
     private void insertRowData(List<ExcelColumnAnnoEntity> annoEntities,
-                               Object rowData, Row row, CellStyle cellStyle) {
+                               Object rowData, Row row) {
         for (int i = 0; i < annoEntities.size(); i++) {
             ExcelColumnAnnoEntity entity = annoEntities.get(i);
             Cell cell = row.createCell(i);
+            //TODO # guang 待优化
+            CellStyle cellStyle = null;
+            if (cacheStyle.get(entity.getColumnName()) == null) {
+                cellStyle = workbook.createCellStyle();
+                cacheStyle.put(entity.getColumnName(), cellStyle);
+            } else {
+                cellStyle = cacheStyle.get(entity.getColumnName());
+            }
+
             cellStyle = entity.getCellStyleHandler().handle(workbook, cellStyle, rowData, entity);
             if (null != cellStyle) {
                 //  Cell 样式设置

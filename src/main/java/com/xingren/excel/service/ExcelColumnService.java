@@ -1,10 +1,12 @@
 package com.xingren.excel.service;
 
 import com.xingren.excel.annotation.ExcelColumn;
-import com.xingren.excel.converter.read.DefaultReadConverter;
 import com.xingren.excel.converter.read.IReadConverter;
-import com.xingren.excel.converter.write.DefaultWriteConverter;
+import com.xingren.excel.converter.read.impl.DefaultReadConverter;
 import com.xingren.excel.converter.write.IWriteConverter;
+import com.xingren.excel.converter.write.impl.DefaultWriteConverter;
+import com.xingren.excel.handler.ICellStyleHandler;
+import com.xingren.excel.handler.IColumnNameCellStyleHandler;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.AnnotationUtil;
 import com.xingren.excel.util.ReflectorUtil;
@@ -65,6 +67,12 @@ public class ExcelColumnService {
                             Class<? extends IReadConverter> readConverter =
                                     (Class<? extends IReadConverter>) AnnotationUtil.getValue(excelColumn,
                                             ANNO_READ_CONVERTER);
+                            Class<? extends ICellStyleHandler> cellStyleHandler =
+                                    (Class<? extends ICellStyleHandler>) AnnotationUtil.getValue(excelColumn,
+                                            ANNO_CELL_STYLE_HANDLER);
+                            Class<? extends IColumnNameCellStyleHandler> columnCellStyleHandler =
+                                    (Class<? extends IColumnNameCellStyleHandler>) AnnotationUtil.getValue(excelColumn,
+                                            ANNO_COLUMN_CELL_STYLE_HANDLER);
                             annoEntity.setIndex(index);
                             annoEntity.setColumnName(columnName);
                             annoEntity.setDatePattern(datePattern);
@@ -89,7 +97,8 @@ public class ExcelColumnService {
                                 } else {
                                     annoEntity.setReadConverter(readConverter.newInstance());
                                 }
-
+                                annoEntity.setCellStyleHandler(cellStyleHandler.newInstance());
+                                annoEntity.setColumnNameCellStyleHandler(columnCellStyleHandler.newInstance());
                             } catch (InstantiationException e) {
                                 e.printStackTrace();
                             } catch (IllegalAccessException e) {

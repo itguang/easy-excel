@@ -29,6 +29,8 @@ public interface ExcelConstant {
     String ANNO_ENMUKEY = "enumKey";
     String ANNO_WRITE_CONVERTER = "writeConverter";
     String ANNO_READ_CONVERTER = "readConverter";
+    String ANNO_CELL_STYLE_HANDLER = "cellStyleHandler";
+    String ANNO_COLUMN_CELL_STYLE_HANDLER = "columnCellStyleHandler";
     String ANNO_TRUE_STR = "trueToStr";
     String ANNO_FALSE_STR = "falseToStr";
     String ANNO_STR_TO_TRUE = "strToTrue";
@@ -48,59 +50,62 @@ public interface ExcelConstant {
     String DEFAULT_DATE_PATTREN = "yyyy/MM/dd";
 
     /**
-     * 列头高度
+     * sheet header 列高
      */
-    int sheetHeaderHeight = 30;
+    int sheetHeaderRowHeight = 30;
 
+    /**
+     * sheet header 字体大小
+     */
+    int sheetHeaderRowFontSize = 15;
+
+    /**
+     * columnName row 高
+     */
+    int columnTitleRowHeight = 25;
     /**
      *
      */
-    int columnTitleHeight = 20;
-    static CellStyle defaultRowTitleStyle(Workbook workbook) {
-        CellStyle style = workbook.createCellStyle();
-        style.setAlignment(HorizontalAlignment.CENTER);
-        style.setVerticalAlignment(VerticalAlignment.CENTER);
-        return style;
+    int columnDataRowHeight = 20;
+
+    /**
+     * 默认的 Excel Header 样式
+     */
+    static CellStyle defaultHeaderRowStyle(Workbook workbook) {
+        CellStyle headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        headerCellStyle.setWrapText(true);
+        Font font = workbook.createFont();
+        font.setFontHeightInPoints((short) sheetHeaderRowFontSize);
+        font.setBold(true);
+        headerCellStyle.setFont(font);
+        return headerCellStyle;
     }
 
     /**
-     * The default Excel header style.
-     *
-     * @param workbook Excel workbook
-     * @return header row cell style
+     * 默认的 Excel ColumnName 样式
      */
-    static CellStyle defaultHeaderStyle(Workbook workbook) {
+    static CellStyle defaultColumnNameStyle(Workbook workbook) {
+        CellStyle headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setAlignment(HorizontalAlignment.CENTER);
+        headerCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        headerCellStyle.setWrapText(true);
+        Font font = workbook.createFont();
+        font.setBold(true);
+        headerCellStyle.setFont(font);
+        return headerCellStyle;
+    }
+
+    /**
+     * 默认的 Exlel Row 数据样式
+     */
+    static CellStyle defaultDataRowStyle(Workbook workbook) {
         CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle.setWrapText(true);
-
-        cellStyle.setDataFormat((short) 0);
-
         Font font = workbook.createFont();
-        font.setFontName(DEFAULT_FONT_NAME);
-
-        cellStyle.setFont(font);
-        return cellStyle;
-    }
-
-    /**
-     * The default Excel column style.
-     *
-     * @param workbook Excel workbook
-     * @return row column cell style
-     */
-    static CellStyle defaultColumnStyle(Workbook workbook) {
-        CellStyle cellStyle = workbook.createCellStyle();
-        cellStyle.setAlignment(HorizontalAlignment.CENTER);
-        cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
-        cellStyle.setWrapText(true);
-
-        cellStyle.setDataFormat((short) 0);
-
-        Font font = workbook.createFont();
-        font.setFontName(DEFAULT_FONT_NAME);
-
         cellStyle.setFont(font);
         return cellStyle;
     }

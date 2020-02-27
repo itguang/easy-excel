@@ -8,10 +8,7 @@ import com.xingren.excel.service.write.ExcelWriteService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.util.ArrayList;
@@ -19,6 +16,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static com.xingren.excel.ExcelConstant.DEFAULT_SHEET_NAME;
+import static com.xingren.excel.ExcelConstant.columnDataRowHeight;
 
 /**
  * @author guang
@@ -26,7 +24,7 @@ import static com.xingren.excel.ExcelConstant.DEFAULT_SHEET_NAME;
  */
 public class ExcelWriter {
 
-    private static Workbook workbook;
+    private Workbook workbook;
 
     private static final ExcelType DEFAULT_EXCEL_TYPE = ExcelType.XLSX;
 
@@ -53,6 +51,15 @@ public class ExcelWriter {
     private ExcelWriteService excelWriteService;
 
     private ExcelWriter() {
+    }
+
+    private ExcelWriter(ExcelType excelType) {
+        this.excelType = excelType;
+        if (ExcelType.XLS.equals(excelType)) {
+            workbook = new HSSFWorkbook();
+        } else {
+            workbook = new XSSFWorkbook();
+        }
     }
 
     /**
@@ -98,10 +105,13 @@ public class ExcelWriter {
         }
 
         // 创建 rows
+        CellStyle style = ExcelConstant.defaultDataRowStyle(workbook);
+        CellStyle cellStyle = workbook.createCellStyle();
         for (Object rowData : rows) {
             Row row = sheet.createRow(++rowIndex);
-            insertRowData(annoEntities, rowData, row);
-            row.setRowStyle(ExcelConstant.defaultColumnStyle(workbook));
+            insertRowData(annoEntities, rowData, row, cellStyle);
+            row.setRowStyle(style);
+            row.setHeightInPoints(columnDataRowHeight);
         }
 
         workbook.setActiveSheet(activeSheet);
@@ -109,11 +119,18 @@ public class ExcelWriter {
     }
 
     private void insertRowData(List<ExcelColumnAnnoEntity> annoEntities,
-                               Object rowData, Row row) {
+                               Object rowData, Row row, CellStyle cellStyle) {
         for (int i = 0; i < annoEntities.size(); i++) {
             ExcelColumnAnnoEntity entity = annoEntities.get(i);
-            Object value = excelWriteService.parseFieldValue(rowData, entity);
-            row.createCell(i).setCellValue(value == null ? "" : value.toString());
+            Cell cell = row.createCell(i);
+            cellStyle = entity.getCellStyleHandler().handle(workbook, cellStyle, rowData, entity);
+            if (null != cellStyle) {
+                //  Cell 样式设置
+                cell.setCellStyle(cellStyle);
+            }
+            Object value = excelWriteService.parseFieldValue(rowData, entity, cell);
+            cell.setCellValue(value == null ? "" : value.toString());
+
         }
     }
 
@@ -122,28 +139,33 @@ public class ExcelWriter {
      */
     private void createColumnTitle(int rowIndex, Sheet sheet, List<ExcelColumnAnnoEntity> annoEntities) {
         Row row = sheet.createRow(rowIndex);
+        row.setRowStyle(ExcelConstant.defaultColumnNameStyle(workbook));
+        row.setHeightInPoints(ExcelConstant.columnTitleRowHeight);
+
         for (int columnNum = 0; columnNum < annoEntities.size(); columnNum++) {
             int columnWidth = sheet.getColumnWidth(columnNum) / 256;
+            ExcelColumnAnnoEntity annoEntity = annoEntities.get(columnNum);
+
             Cell currentCell = row.createCell(columnNum);
-            currentCell.setCellValue(annoEntities.get(columnNum).getColumnName());
+            // columnName Style 设置
+            CellStyle columnCellStyle = annoEntity.getColumnNameCellStyleHandler().handle(workbook, annoEntity);
+            if (null != columnCellStyle) {
+                currentCell.setCellStyle(columnCellStyle);
+            }
+            currentCell.setCellValue(annoEntity.getColumnName());
+
+            // 自动列宽
             int length = currentCell.getStringCellValue().getBytes().length;
             if (columnWidth < length) {
                 columnWidth = length;
             }
             sheet.setColumnWidth(columnNum, columnWidth * 256);
         }
-        row.setRowStyle(ExcelConstant.defaultRowTitleStyle(workbook));
-        row.setHeightInPoints(ExcelConstant.columnTitleHeight);
+
     }
 
     public static ExcelWriter create(ExcelType excelType) {
-        if (ExcelType.XLS.equals(excelType)) {
-            workbook = new HSSFWorkbook();
-        } else {
-            workbook = new XSSFWorkbook();
-        }
-
-        return new ExcelWriter();
+        return new ExcelWriter(excelType);
     }
 
     public static ExcelWriter create() {

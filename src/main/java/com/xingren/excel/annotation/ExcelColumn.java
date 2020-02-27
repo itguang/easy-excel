@@ -1,9 +1,13 @@
 package com.xingren.excel.annotation;
 
-import com.xingren.excel.converter.read.DefaultReadConverter;
 import com.xingren.excel.converter.read.IReadConverter;
-import com.xingren.excel.converter.write.DefaultWriteConverter;
+import com.xingren.excel.converter.read.impl.DefaultReadConverter;
 import com.xingren.excel.converter.write.IWriteConverter;
+import com.xingren.excel.converter.write.impl.DefaultWriteConverter;
+import com.xingren.excel.handler.ICellStyleHandler;
+import com.xingren.excel.handler.IColumnNameCellStyleHandler;
+import com.xingren.excel.handler.impl.DefaultColumnNameCellStyleHandler;
+import com.xingren.excel.handler.impl.DefaultICellStyleHandler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -88,5 +92,15 @@ public @interface ExcelColumn {
      * 导入转换器
      */
     Class<? extends IReadConverter> readConverter() default DefaultReadConverter.class;
+
+    /**
+     * 单个 Cell 样式处理器
+     */
+    Class<? extends ICellStyleHandler> cellStyleHandler() default DefaultICellStyleHandler.class;
+
+    /**
+     * columnName 样式处理器
+     */
+    Class<? extends IColumnNameCellStyleHandler> columnCellStyleHandler() default DefaultColumnNameCellStyleHandler.class;
 
 }

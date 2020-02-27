@@ -2,7 +2,7 @@ package com.xingren.excel.service.write;
 
 import com.xingren.excel.ExcelConstant;
 import com.xingren.excel.annotation.ExcelColumn;
-import com.xingren.excel.converter.write.*;
+import com.xingren.excel.converter.write.impl.*;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.ReflectorUtil;
 import org.apache.commons.collections.CollectionUtils;
@@ -20,7 +20,7 @@ import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.xingren.excel.ExcelConstant.sheetHeaderHeight;
+import static com.xingren.excel.ExcelConstant.sheetHeaderRowHeight;
 
 /**
  * @author guang
@@ -41,7 +41,7 @@ public class ExcelWriteService<T> {
         return new ExcelWriteService(clazz);
     }
 
-    public Object parseFieldValue(Object rowData, ExcelColumnAnnoEntity entity) {
+    public Object parseFieldValue(Object rowData, ExcelColumnAnnoEntity entity, Cell cell) {
         String filedName = entity.getFiledName();
         Method getMethod = reflectorUtil.getGetMethod(filedName);
         Class<?> type = entity.getField().getType();
@@ -107,8 +107,8 @@ public class ExcelWriteService<T> {
         Row row0 = sheet.createRow(rowIndex);
         Cell header = row0.createCell(0);
         header.setCellValue(sheetHeader);
-        header.setCellStyle(ExcelConstant.defaultHeaderStyle(workbook));
-        row0.setHeightInPoints(sheetHeaderHeight);
+        header.setCellStyle(ExcelConstant.defaultHeaderRowStyle(workbook));
+        row0.setHeightInPoints(sheetHeaderRowHeight);
     }
 
 }

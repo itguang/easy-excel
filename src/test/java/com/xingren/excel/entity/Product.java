@@ -1,6 +1,7 @@
 package com.xingren.excel.entity;
 
 import com.xingren.excel.annotation.ExcelColumn;
+import com.xingren.excel.handler.impl.RedFontCellStyleHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -30,7 +31,8 @@ public class Product {
     @ExcelColumn(columnName = "是否是新品", index = 41, trueToStr = "新品", falseToStr = "非新品")
     private Boolean isNew;
 
-    @ExcelColumn(columnName = "订单状态", index = 50, enumKey = "name", prefix = "状态: ")
+    @ExcelColumn(columnName = "订单状态", index = 50, enumKey = "name", prefix = "状态: ", cellStyleHandler =
+            RedFontCellStyleHandler.class)
     private StateEnum stateEnum;
 
     @ExcelColumn(columnName = "状态变更日期", index = 55)

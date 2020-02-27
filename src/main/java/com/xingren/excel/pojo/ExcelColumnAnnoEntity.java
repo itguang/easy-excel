@@ -2,6 +2,8 @@ package com.xingren.excel.pojo;
 
 import com.xingren.excel.converter.read.IReadConverter;
 import com.xingren.excel.converter.write.IWriteConverter;
+import com.xingren.excel.handler.ICellStyleHandler;
+import com.xingren.excel.handler.IColumnNameCellStyleHandler;
 import lombok.Data;
 
 import java.lang.reflect.Field;
@@ -28,6 +30,10 @@ public class ExcelColumnAnnoEntity {
     private IWriteConverter writeConverter;
 
     private IReadConverter readConverter;
+
+    private ICellStyleHandler cellStyleHandler;
+
+    private IColumnNameCellStyleHandler columnNameCellStyleHandler;
 
     private String trueStr;
 

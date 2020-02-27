@@ -1,44 +1,39 @@
-package com.xingren.excel.converter.write;
+package com.xingren.excel.converter.write.impl;
 
+import com.xingren.excel.converter.write.IWriteConverter;
 import com.xingren.excel.exception.ExcelConvertException;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
+import com.xingren.excel.util.DateUtil;
 import com.xingren.excel.util.ReflectorUtil;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.OffsetDateTime;
 
 /**
  * @author guang
- * @since 2020/2/8 4:51 下午
+ * @since 2020/2/8 12:28 下午
  */
-public class BooleanWriteConverter implements IWriteConverter {
+public class OffSetDateTimeWriteConverter implements IWriteConverter {
+
     @Override
     public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
-
-        if (!Boolean.class.equals(entity.getField().getType())) {
+        if (!OffsetDateTime.class.equals(entity.getField().getType())) {
             throw new ExcelConvertException("类 " + clazz.getName() + " 中字段:"
-                    + entity.getFiledName() + " 不是 Boolean 类型!");
+                    + entity.getFiledName() + " 不是 OffsetDateTime 类型!");
         }
 
         Method getMethod = ReflectorUtil.forClass(clazz).getGetMethod(entity.getFiledName());
-        Boolean b = null;
+        OffsetDateTime offsetDateTime = null;
         try {
-            b = (Boolean) getMethod.invoke(rowData);
+            offsetDateTime = (OffsetDateTime) getMethod.invoke(rowData);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         } catch (InvocationTargetException e) {
             e.printStackTrace();
         }
 
-        if (null == b) {
-            return null;
-        }
-
-        if (b) {
-            return entity.getTrueStr();
-        } else {
-            return entity.getFalseStr();
-        }
+        return DateUtil.formatOffsetDateTime(offsetDateTime, entity.getDatePattern());
 
     }
 }

@@ -24,7 +24,7 @@ public class ExcelReaderTest {
     @Before
     public void before() {
         String resourcePath = this.getClass().getClassLoader().getResource("").getPath().replace("classes",
-                "resources");
+                "resources").replace("/out", "/src");
         employeeFile_Xls = resourcePath + "read/员工数据.xls";
         employeeFile_Xlsx = resourcePath + "read/员工数据.xlsx";
         employeeFile_1w_Xlsx = resourcePath + "read/员工数据_1w.xlsx";

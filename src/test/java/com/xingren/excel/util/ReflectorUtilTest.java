@@ -30,7 +30,7 @@ public class ReflectorUtilTest {
                 .filter(field -> field.isAnnotationPresent(ExcelColumn.class)
                 ).collect(Collectors.toList());
 
-        assertEquals(excelColumnFields.size(), fieldList.size() - 1);
+        assertEquals(excelColumnFields.size(), fieldList.size());
 
     }
 
@@ -43,7 +43,6 @@ public class ReflectorUtilTest {
         assertNotNull(getMethods.get("price"));
         assertNotNull(getMethods.get("created"));
         assertNotNull(getMethods.get("name"));
-        assertNull(getMethods.get("other"));
     }
 
     @Test
@@ -54,7 +53,6 @@ public class ReflectorUtilTest {
         assertNotNull(setMethods.get("price"));
         assertNotNull(setMethods.get("created"));
         assertNotNull(setMethods.get("name"));
-        assertNull(setMethods.get("other"));
 
     }
 

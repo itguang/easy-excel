@@ -1,7 +1,6 @@
 package com.xingren.excel;
 
 import com.xingren.excel.entity.Employee;
-import com.xingren.excel.entity.Gender;
 import com.xingren.excel.entity.Product;
 import com.xingren.excel.entity.StateEnum;
 import com.xingren.excel.enums.ExcelType;
@@ -28,7 +27,7 @@ public class ExcelWriterTest {
     ArrayList<Product> products;
     String productFile_XLS;
     String productFile_XLSX;
-    String productTemplate_XLSX;
+    String productEmptyFile_XLSX;
     String employeeTemplate_XLSX;
 
     @Before
@@ -36,10 +35,10 @@ public class ExcelWriterTest {
 
         // 导出文件路径 out/resources/export/ 文件下
         String resourcePath = this.getClass().getClassLoader().getResource("").getPath().replace("classes",
-                "resources");
+                "resources").replace("/out", "/src");
         productFile_XLS = resourcePath + "export/导出商品数据.xls";
         productFile_XLSX = resourcePath + "export/导出商品数据.xlsx";
-        productTemplate_XLSX = resourcePath + "export/商品模板表.xlsx";
+        productEmptyFile_XLSX = resourcePath + "export/空的商品数据.xlsx";
         employeeTemplate_XLSX = resourcePath + "export/员工模板表.xlsx";
 
         Product apple = new Product(1000,
@@ -72,49 +71,12 @@ public class ExcelWriterTest {
     }
 
     @Test
-    public void testExportTemplate() throws IOException {
-        Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
-                .sheetName("商品模板表")
-                .sheetHeader("--商品数据--")
-                .activeSheet(0)
-                .writeTemplate(Product.class);
-
-        File file = new File(productTemplate_XLSX);
-        OutputStream outputStream = new FileOutputStream(file);
-        workbook.write(outputStream);
-        outputStream.close();
-
-    }
-
-    @Test
     public void testExportEmployeeTemplate() throws IOException {
         Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
                 .sheetName("员工模板表")
                 .sheetHeader("--员工数据--")
                 .activeSheet(0)
                 .writeTemplate(Employee.class);
-
-        File file = new File(employeeTemplate_XLSX);
-        OutputStream outputStream = new FileOutputStream(file);
-        workbook.write(outputStream);
-        outputStream.close();
-
-    }
-
-    @Test
-    public void testExportEmployee() throws IOException {
-
-        ArrayList<Employee> employees = new ArrayList<>();
-        for (int i = 0; i < 10000; i++) {
-            Employee employee = new Employee(i, "李" + i, 100L + i, Gender.MALE, OffsetDateTime.now().minusDays(i));
-            employees.add(employee);
-        }
-
-        Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
-                .sheetName("员工模板表")
-                .sheetHeader("--员工数据--")
-                .activeSheet(0)
-                .write(employees,Employee.class);
 
         File file = new File(employeeTemplate_XLSX);
         OutputStream outputStream = new FileOutputStream(file);
@@ -132,7 +94,7 @@ public class ExcelWriterTest {
                 .activeSheet(0)
                 .write(emptyProducts, Product.class);
 
-        File file = new File(productFile_XLSX);
+        File file = new File(productEmptyFile_XLSX);
         OutputStream outputStream = new FileOutputStream(file);
         workbook.write(outputStream);
         outputStream.close();
@@ -143,7 +105,7 @@ public class ExcelWriterTest {
      * 10000 行数据导出测试 10s 需要优化
      */
     @Test
-    public void testExport_10k() throws IOException {
+    public void testExport_1w_xlsx() throws IOException {
 
         ArrayList<Product> products = new ArrayList<>();
 

@@ -8,13 +8,11 @@ import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.service.ExcelColumnService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Workbook;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
+import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -24,22 +22,19 @@ import static org.junit.Assert.assertTrue;
 
 public class ExcelWriterTest {
 
-    ArrayList<Product> products;
-    String productFile_XLS;
-    String productFile_XLSX;
-    String productEmptyFile_XLSX;
-    String employeeTemplate_XLSX;
+    static ArrayList<Product> products;
+    static String productFile_XLS;
+    static String productFile_XLSX;
+    static String productEmptyFile_XLSX;
+    static String employeeTemplate_XLSX;
 
-    @Before
-    public void before() {
-
-        // 导出文件路径 out/resources/export/ 文件下
-        String resourcePath = this.getClass().getClassLoader().getResource("").getPath().replace("classes",
-                "resources").replace("/out", "/src");
-        productFile_XLS = resourcePath + "export/导出商品数据.xls";
-        productFile_XLSX = resourcePath + "export/导出商品数据_1w.xlsx";
-        productEmptyFile_XLSX = resourcePath + "export/空的商品数据.xlsx";
-        employeeTemplate_XLSX = resourcePath + "export/员工模板表.xlsx";
+    @BeforeClass
+    public static void before() throws UnsupportedEncodingException {
+        ClassLoader classLoader = ExcelWriterTest.class.getClassLoader();
+        productFile_XLS = URLDecoder.decode(classLoader.getResource("export/导出商品数据.xls").getPath(), "utf-8");
+        productFile_XLSX = URLDecoder.decode(classLoader.getResource("export/导出商品数据_1w.xlsx").getPath(), "utf-8");
+        productEmptyFile_XLSX = URLDecoder.decode(classLoader.getResource("export/空的商品数据.xlsx").getPath(), "utf-8");
+        employeeTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/员工模板表.xlsx").getPath(), "utf-8");
 
         Product apple = new Product(1000,
                 1000L, OffsetDateTime.now(),

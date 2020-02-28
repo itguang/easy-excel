@@ -30,7 +30,7 @@ public class ReflectorUtilTest {
                 .filter(field -> field.isAnnotationPresent(ExcelColumn.class)
                 ).collect(Collectors.toList());
 
-        assertEquals(excelColumnFields.size(), fieldList.size());
+        assertEquals(excelColumnFields.size(), fieldList.size()-1);
 
     }
 

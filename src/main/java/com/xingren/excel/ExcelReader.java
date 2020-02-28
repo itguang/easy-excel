@@ -63,7 +63,7 @@ public class ExcelReader {
         return new ExcelReader(inputStream, excelType);
     }
 
-    public <T> List<T> to(Class<T> clazz) {
+    public <T> List<T> toPojo(Class<T> clazz) {
         List<T> rowDataList = null;
         Sheet sheet = workbook.getSheetAt(sheetNum);
         int lastRowIndex = sheet.getLastRowNum();

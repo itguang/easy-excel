@@ -43,7 +43,7 @@ public class ExcelReaderTest {
         List<Employee> employees = ExcelReader
                 .read(fileInputStream, ExcelType.XLSX)
                 .startRowNum(1)
-                .to(Employee.class);
+                .toPojo(Employee.class);
         Assert.assertNotNull(employees);
     }
 
@@ -55,7 +55,7 @@ public class ExcelReaderTest {
         List<Employee> employees = ExcelReader
                 .read(fileInputStream, ExcelType.XLS)
                 .startRowNum(1)
-                .to(Employee.class);
+                .toPojo(Employee.class);
         Assert.assertNotNull(employees);
     }
 
@@ -65,7 +65,7 @@ public class ExcelReaderTest {
         List<Employee> employees = ExcelReader
                 .read(fileInputStream, ExcelType.XLSX)
                 .startRowNum(1)
-                .to(Employee.class);
+                .toPojo(Employee.class);
         Assert.assertNotNull(employees);
     }
 

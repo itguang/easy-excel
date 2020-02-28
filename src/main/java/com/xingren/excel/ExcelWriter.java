@@ -157,6 +157,7 @@ public class ExcelWriter {
     private void createColumnTitle(int rowIndex, Sheet sheet, List<ExcelColumnAnnoEntity> annoEntities) {
         Row row = sheet.createRow(rowIndex);
         row.setRowStyle(ExcelConstant.defaultColumnNameStyle(workbook));
+        // ColumnName 高度设置
         row.setHeightInPoints(ExcelConstant.columnTitleRowHeight);
 
         for (int columnNum = 0; columnNum < annoEntities.size(); columnNum++) {

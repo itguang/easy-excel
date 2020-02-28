@@ -1,6 +1,7 @@
 package com.xingren.excel.entity;
 
 import com.xingren.excel.annotation.ExcelColumn;
+import com.xingren.excel.handler.impl.GreyBgCellStyleHandler;
 import com.xingren.excel.handler.impl.RedFontCellStyleHandler;
 import com.xingren.excel.handler.impl.YellowBgCellStyleHandler;
 import lombok.AllArgsConstructor;
@@ -24,7 +25,7 @@ public class Product {
             YellowBgCellStyleHandler.class)
     private Long price;
 
-    @ExcelColumn(columnName = "创建日期", index = 60)
+    @ExcelColumn(columnName = "创建日期", index = 60, columnNameCellStyleHandler = GreyBgCellStyleHandler.class)
     private OffsetDateTime created;
 
     @ExcelColumn(columnName = "名称", index = 40)

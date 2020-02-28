@@ -91,13 +91,13 @@ public class Product {
 
 导出表格:
 
-![3DWpTO.png](3DWpTO.png)
+![3DWpTO.png](https://s2.ax1x.com/2020/02/28/3DWpTO.png)
 
 ## 导入
 
 假设我们现在有这样一张 excel 表格：
 
-![3D4YnI.png](3D4YnI.png)
+![3D4YnI.png](https://s2.ax1x.com/2020/02/28/3D4YnI.png)
 
 **第一步:** 给需要接收excel数据的 pojo 实体类添加注解: `@ExcelColumn`
 

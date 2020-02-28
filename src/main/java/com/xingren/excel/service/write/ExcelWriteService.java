@@ -34,7 +34,7 @@ public class ExcelWriteService<T> {
 
     private ExcelWriteService(Class clazz) {
         this.clazz = clazz;
-        this.reflectorUtil = ReflectorUtil.forClass(clazz);
+        this.reflectorUtil = ReflectorUtil.fromCache(clazz);
     }
 
     public static <T> ExcelWriteService forClass(Class<T> clazz) {

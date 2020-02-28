@@ -35,7 +35,7 @@ public class ExcelReadService {
 
     private ExcelReadService(Class clazz) {
         this.clazz = clazz;
-        this.reflectorUtil = ReflectorUtil.forClass(clazz);
+        this.reflectorUtil = ReflectorUtil.fromCache(clazz);
     }
 
     public static <T> ExcelReadService forClass(Class<T> clazz) {

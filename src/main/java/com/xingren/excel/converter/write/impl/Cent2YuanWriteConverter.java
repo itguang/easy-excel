@@ -18,7 +18,7 @@ public class Cent2YuanWriteConverter implements IWriteConverter {
 
         Class<?> type = entity.getField().getType();
 
-        Method getMethod = ReflectorUtil.forClass(clazz).getGetMethod(entity.getFiledName());
+        Method getMethod = ReflectorUtil.fromCache(clazz).getGetMethod(entity.getFiledName());
         Object value = null;
         try {
             value = getMethod.invoke(rowData);

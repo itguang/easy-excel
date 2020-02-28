@@ -29,7 +29,7 @@ public class ExcelColumnService {
 
     private ExcelColumnService(Class clazz) {
         this.clazz = clazz;
-        this.reflectorUtil = ReflectorUtil.forClass(clazz);
+        this.reflectorUtil = ReflectorUtil.fromCache(clazz);
     }
 
     public static <T> ExcelColumnService forClass(Class<T> clazz) {

@@ -22,7 +22,7 @@ public class EnumWriteConverter implements IWriteConverter {
     public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
         Object value = null;
         String filedName = entity.getFiledName();
-        Method getMethod = ReflectorUtil.forClass(clazz).getGetMethod(filedName);
+        Method getMethod = ReflectorUtil.fromCache(clazz).getGetMethod(filedName);
 
         Class<?> enumClass = entity.getField().getType();
         if (!enumClass.isEnum()) {

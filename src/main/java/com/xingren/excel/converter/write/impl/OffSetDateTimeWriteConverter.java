@@ -23,7 +23,7 @@ public class OffSetDateTimeWriteConverter implements IWriteConverter {
                     + entity.getFiledName() + " 不是 OffsetDateTime 类型!");
         }
 
-        Method getMethod = ReflectorUtil.forClass(clazz).getGetMethod(entity.getFiledName());
+        Method getMethod = ReflectorUtil.fromCache(clazz).getGetMethod(entity.getFiledName());
         OffsetDateTime offsetDateTime = null;
         try {
             offsetDateTime = (OffsetDateTime) getMethod.invoke(rowData);

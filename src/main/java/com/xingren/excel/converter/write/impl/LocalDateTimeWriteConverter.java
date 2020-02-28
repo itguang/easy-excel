@@ -23,7 +23,7 @@ public class LocalDateTimeWriteConverter implements IWriteConverter {
                     + entity.getFiledName() + " 不是 LocalDateTime 类型!");
         }
 
-        Method getMethod = ReflectorUtil.forClass(clazz).getGetMethod(entity.getFiledName());
+        Method getMethod = ReflectorUtil.fromCache(clazz).getGetMethod(entity.getFiledName());
         LocalDateTime localDateTime = null;
         try {
             localDateTime = (LocalDateTime) getMethod.invoke(rowData);

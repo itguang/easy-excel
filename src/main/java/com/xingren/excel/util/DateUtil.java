@@ -10,7 +10,10 @@ import org.apache.commons.lang3.StringUtils;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.*;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
@@ -18,24 +21,6 @@ import java.util.Date;
  * 日期时间工具类
  */
 public class DateUtil {
-
-    private static final String OFFSET_ID = "+08:00";
-
-    /**
-     * 根据字符串设置日期
-     *
-     * @param text
-     * @param formatter
-     * @return
-     */
-    private static OffsetDateTime parseToOffsetDateTime(CharSequence text, DateTimeFormatter formatter) {
-        if (StringUtils.isEmpty(text) || formatter == null) {
-            return null;
-        }
-        LocalDateTime localDateTime = LocalDateTime.parse(text, formatter);
-        OffsetDateTime dateTime = OffsetDateTime.of(localDateTime, ZoneOffset.of(OFFSET_ID));
-        return dateTime;
-    }
 
     /**
      * 格式化时间

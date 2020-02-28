@@ -1,7 +1,7 @@
 package com.xingren.excel.util;
 
-import com.xingren.excel.entity.Product;
 import com.xingren.excel.annotation.ExcelColumn;
+import com.xingren.excel.entity.Product;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -11,14 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class ReflectorUtilTest {
     ReflectorUtil reflectorUtil;
 
     @Before
-    public void setUp() throws Exception {
-        reflectorUtil = ReflectorUtil.forClass(Product.class);
+    public void setUp() {
+        reflectorUtil = ReflectorUtil.fromCache(Product.class);
     }
 
     @Test
@@ -30,7 +31,7 @@ public class ReflectorUtilTest {
                 .filter(field -> field.isAnnotationPresent(ExcelColumn.class)
                 ).collect(Collectors.toList());
 
-        assertEquals(excelColumnFields.size(), fieldList.size()-1);
+        assertEquals(excelColumnFields.size(), fieldList.size() - 1);
 
     }
 
@@ -55,7 +56,5 @@ public class ReflectorUtilTest {
         assertNotNull(setMethods.get("name"));
 
     }
-
-
 
 }

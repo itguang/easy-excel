@@ -21,7 +21,7 @@ public class BooleanWriteConverter implements IWriteConverter {
                     + entity.getFiledName() + " 不是 Boolean 类型!");
         }
 
-        Method getMethod = ReflectorUtil.forClass(clazz).getGetMethod(entity.getFiledName());
+        Method getMethod = ReflectorUtil.fromCache(clazz).getGetMethod(entity.getFiledName());
         Boolean b = null;
         try {
             b = (Boolean) getMethod.invoke(rowData);

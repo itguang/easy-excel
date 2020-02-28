@@ -98,15 +98,13 @@ public interface ExcelConstant {
     }
 
     /**
-     * 默认的 Exlel Row 数据样式
+     * 默认的 Exlel Row 数据样式,垂直水平居中
      */
     static CellStyle defaultDataRowStyle(Workbook workbook) {
         CellStyle cellStyle = workbook.createCellStyle();
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle.setWrapText(true);
-        Font font = workbook.createFont();
-        cellStyle.setFont(font);
         return cellStyle;
     }
 

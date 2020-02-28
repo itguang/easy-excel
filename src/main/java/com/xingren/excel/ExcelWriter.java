@@ -130,23 +130,25 @@ public class ExcelWriter {
             ExcelColumnAnnoEntity entity = annoEntities.get(i);
             Cell cell = row.createCell(i);
             //TODO # guang 待优化
-            CellStyle cellStyle = null;
-            if (cacheStyle.get(entity.getColumnName()) == null) {
-                cellStyle = workbook.createCellStyle();
-                cacheStyle.put(entity.getColumnName(), cellStyle);
-            } else {
-                cellStyle = cacheStyle.get(entity.getColumnName());
-            }
-
-            cellStyle = entity.getCellStyleHandler().handle(workbook, cellStyle, rowData, entity);
-            if (null != cellStyle) {
-                //  Cell 样式设置
-                cell.setCellStyle(cellStyle);
-            }
+            CellStyle defaultCellStyle = getDefaultCellStyle(entity);
+            defaultCellStyle = entity.getCellStyleHandler().handle(workbook, defaultCellStyle, rowData, entity);
+            //  Cell 样式设置
+            cell.setCellStyle(defaultCellStyle);
             Object value = excelWriteService.parseFieldValue(rowData, entity, cell);
             cell.setCellValue(value == null ? "" : value.toString());
 
         }
+    }
+
+    private CellStyle getDefaultCellStyle(ExcelColumnAnnoEntity entity) {
+        CellStyle cellStyle;
+        if (cacheStyle.get(entity.getColumnName()) == null) {
+            cellStyle = ExcelConstant.defaultDataRowStyle(workbook);
+            cacheStyle.put(entity.getColumnName(), cellStyle);
+        } else {
+            cellStyle = cacheStyle.get(entity.getColumnName());
+        }
+        return cellStyle;
     }
 
     /**

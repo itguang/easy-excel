@@ -2,6 +2,7 @@ package com.xingren.excel;
 
 import com.xingren.excel.entity.Employee;
 import com.xingren.excel.enums.ExcelType;
+import com.xingren.excel.exception.ExcelException;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -47,14 +48,27 @@ public class ExcelReaderTest {
         Assert.assertNotNull(employees);
     }
 
-
-
     @Test
     public void testImportXls() throws FileNotFoundException {
         InputStream fileInputStream = new FileInputStream(employeeFile_Xls);
         List<Employee> employees = ExcelReader
                 .read(fileInputStream, ExcelType.XLS)
                 .startRowNum(1)
+                .toPojo(Employee.class);
+        Assert.assertNotNull(employees);
+    }
+
+    /**
+     * 起始行不合法
+     *
+     * @throws FileNotFoundException
+     */
+    @Test(expected = ExcelException.class)
+    public void testtestImportXls() throws FileNotFoundException {
+        InputStream fileInputStream = new FileInputStream(employeeFile_Xls);
+        List<Employee> employees = ExcelReader
+                .read(fileInputStream, ExcelType.XLS)
+                .startRowNum(0)
                 .toPojo(Employee.class);
         Assert.assertNotNull(employees);
     }

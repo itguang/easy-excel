@@ -1,6 +1,7 @@
 package com.xingren.excel;
 
 import com.xingren.excel.enums.ExcelType;
+import com.xingren.excel.exception.ExcelException;
 import com.xingren.excel.pojo.ColumnEntity;
 import com.xingren.excel.pojo.RowEntity;
 import com.xingren.excel.service.read.ExcelReadService;
@@ -68,6 +69,10 @@ public class ExcelReader {
         Sheet sheet = workbook.getSheetAt(sheetNum);
         int lastRowIndex = sheet.getLastRowNum();
         Row columnTitleRow = sheet.getRow(startRowNum++);
+        Row lastRow = sheet.getRow(lastRowIndex);
+        if (columnTitleRow.getLastCellNum() != lastRow.getLastCellNum()) {
+            throw new ExcelException("解析Excel 失败,检查起始 startRowNum 是否设置正确");
+        }
 
         String[] columnNames = getColumnNames(columnTitleRow);
 

@@ -6,7 +6,6 @@ import com.xingren.excel.converter.read.impl.DefaultReadConverter;
 import com.xingren.excel.converter.write.IWriteConverter;
 import com.xingren.excel.converter.write.impl.DefaultWriteConverter;
 import com.xingren.excel.handler.ICellStyleHandler;
-import com.xingren.excel.handler.IColumnNameCellStyleHandler;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.AnnotationUtil;
 import com.xingren.excel.util.ReflectorUtil;
@@ -70,8 +69,8 @@ public class ExcelColumnService {
                             Class<? extends ICellStyleHandler> cellStyleHandler =
                                     (Class<? extends ICellStyleHandler>) AnnotationUtil.getValue(excelColumn,
                                             ANNO_CELL_STYLE_HANDLER);
-                            Class<? extends IColumnNameCellStyleHandler> columnCellStyleHandler =
-                                    (Class<? extends IColumnNameCellStyleHandler>) AnnotationUtil.getValue(excelColumn,
+                            Class<? extends ICellStyleHandler> columnCellStyleHandler =
+                                    (Class<? extends ICellStyleHandler>) AnnotationUtil.getValue(excelColumn,
                                             ANNO_COLUMN_CELL_STYLE_HANDLER);
                             annoEntity.setIndex(index);
                             annoEntity.setColumnName(columnName);

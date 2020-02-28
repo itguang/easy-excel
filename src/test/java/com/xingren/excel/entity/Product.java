@@ -2,6 +2,7 @@ package com.xingren.excel.entity;
 
 import com.xingren.excel.annotation.ExcelColumn;
 import com.xingren.excel.handler.impl.RedFontCellStyleHandler;
+import com.xingren.excel.handler.impl.YellowBgCellStyleHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
@@ -19,7 +20,8 @@ public class Product {
     @ExcelColumn(columnName = "id", index = 10)
     private Integer id;
 
-    @ExcelColumn(columnName = "价格", index = 20, centToYuan = true, suffix = " 元")
+    @ExcelColumn(columnName = "价格", index = 20, centToYuan = true, suffix = " 元", columnNameCellStyleHandler =
+            YellowBgCellStyleHandler.class)
     private Long price;
 
     @ExcelColumn(columnName = "创建日期", index = 60)

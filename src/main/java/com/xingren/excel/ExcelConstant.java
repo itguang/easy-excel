@@ -30,7 +30,7 @@ public interface ExcelConstant {
     String ANNO_WRITE_CONVERTER = "writeConverter";
     String ANNO_READ_CONVERTER = "readConverter";
     String ANNO_CELL_STYLE_HANDLER = "cellStyleHandler";
-    String ANNO_COLUMN_CELL_STYLE_HANDLER = "columnCellStyleHandler";
+    String ANNO_COLUMN_CELL_STYLE_HANDLER = "columnNameCellStyleHandler";
     String ANNO_TRUE_STR = "trueToStr";
     String ANNO_FALSE_STR = "falseToStr";
     String ANNO_STR_TO_TRUE = "strToTrue";

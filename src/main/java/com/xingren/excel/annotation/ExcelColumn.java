@@ -5,7 +5,6 @@ import com.xingren.excel.converter.read.impl.DefaultReadConverter;
 import com.xingren.excel.converter.write.IWriteConverter;
 import com.xingren.excel.converter.write.impl.DefaultWriteConverter;
 import com.xingren.excel.handler.ICellStyleHandler;
-import com.xingren.excel.handler.IColumnNameCellStyleHandler;
 import com.xingren.excel.handler.impl.DefaultColumnNameCellStyleHandler;
 import com.xingren.excel.handler.impl.DefaultICellStyleHandler;
 
@@ -94,13 +93,13 @@ public @interface ExcelColumn {
     Class<? extends IReadConverter> readConverter() default DefaultReadConverter.class;
 
     /**
-     * 单个 Cell 样式处理器
+     * 单个 Data Cell 样式处理器
      */
     Class<? extends ICellStyleHandler> cellStyleHandler() default DefaultICellStyleHandler.class;
 
     /**
      * columnName 样式处理器
      */
-    Class<? extends IColumnNameCellStyleHandler> columnCellStyleHandler() default DefaultColumnNameCellStyleHandler.class;
+    Class<? extends ICellStyleHandler> columnNameCellStyleHandler() default DefaultColumnNameCellStyleHandler.class;
 
 }

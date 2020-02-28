@@ -165,7 +165,9 @@ public class ExcelWriter {
 
             Cell currentCell = row.createCell(columnNum);
             // columnName Style 设置
-            CellStyle columnCellStyle = annoEntity.getColumnNameCellStyleHandler().handle(workbook, annoEntity);
+            CellStyle defaultColumnNameStyle = ExcelConstant.defaultColumnNameStyle(workbook);
+            CellStyle columnCellStyle = annoEntity.getColumnNameCellStyleHandler().handle(workbook,
+                    defaultColumnNameStyle, null, annoEntity);
             if (null != columnCellStyle) {
                 currentCell.setCellStyle(columnCellStyle);
             }

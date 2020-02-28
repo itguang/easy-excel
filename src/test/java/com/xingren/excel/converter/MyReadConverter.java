@@ -10,6 +10,6 @@ import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 public class MyReadConverter implements IReadConverter {
     @Override
     public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue) {
-        return "我就试试好使不?";
+        return "[" + cellValue + "]";
     }
 }

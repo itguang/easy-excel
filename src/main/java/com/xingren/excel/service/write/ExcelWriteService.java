@@ -5,7 +5,7 @@ import com.xingren.excel.annotation.ExcelColumn;
 import com.xingren.excel.converter.write.impl.*;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.ReflectorUtil;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;

@@ -10,7 +10,6 @@ import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.AnnotationUtil;
 import com.xingren.excel.util.ReflectorUtil;
 import org.apache.poi.ss.formula.functions.T;
-import org.springframework.core.annotation.AnnotationUtils;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -48,18 +47,18 @@ public class ExcelColumnService {
                             annoEntity.setField(field);
                             annoEntity.setFiledName(field.getName());
                             ExcelColumn excelColumn = field.getAnnotation(ExcelColumn.class);
-                            Integer index = (Integer) AnnotationUtils.getValue(excelColumn, ANNO_INDEX);
-                            String columnName = (String) AnnotationUtils.getValue(excelColumn, ANNO_COLUMN_NAME);
-                            String datePattern = (String) AnnotationUtils.getValue(excelColumn, ANNO_DATE_PATTERN);
-                            String enumImportKey = (String) AnnotationUtils.getValue(excelColumn, ANNO_ENMUKEY);
-                            String trueStr = (String) AnnotationUtils.getValue(excelColumn, ANNO_TRUE_STR);
-                            String falseStr = (String) AnnotationUtils.getValue(excelColumn, ANNO_FALSE_STR);
-                            String strToFalse = (String) AnnotationUtils.getValue(excelColumn, ANNO_STR_TO_FALSE);
-                            String strToTrue = (String) AnnotationUtils.getValue(excelColumn, ANNO_STR_TO_TRUE);
-                            Boolean centToYuan = (Boolean) AnnotationUtils.getValue(excelColumn, ANNO_CENT_TO_YUAN);
-                            Boolean yuanToCent = (Boolean) AnnotationUtils.getValue(excelColumn, ANNO_YUAN_TO_CENT);
-                            String prefix = (String) AnnotationUtils.getValue(excelColumn, ANNO_PREFIX);
-                            String suffix = (String) AnnotationUtils.getValue(excelColumn, ANNO_SUFFIX);
+                            Integer index = (Integer) AnnotationUtil.getValue(excelColumn, ANNO_INDEX);
+                            String columnName = (String) AnnotationUtil.getValue(excelColumn, ANNO_COLUMN_NAME);
+                            String datePattern = (String) AnnotationUtil.getValue(excelColumn, ANNO_DATE_PATTERN);
+                            String enumImportKey = (String) AnnotationUtil.getValue(excelColumn, ANNO_ENMUKEY);
+                            String trueStr = (String) AnnotationUtil.getValue(excelColumn, ANNO_TRUE_STR);
+                            String falseStr = (String) AnnotationUtil.getValue(excelColumn, ANNO_FALSE_STR);
+                            String strToFalse = (String) AnnotationUtil.getValue(excelColumn, ANNO_STR_TO_FALSE);
+                            String strToTrue = (String) AnnotationUtil.getValue(excelColumn, ANNO_STR_TO_TRUE);
+                            Boolean centToYuan = (Boolean) AnnotationUtil.getValue(excelColumn, ANNO_CENT_TO_YUAN);
+                            Boolean yuanToCent = (Boolean) AnnotationUtil.getValue(excelColumn, ANNO_YUAN_TO_CENT);
+                            String prefix = (String) AnnotationUtil.getValue(excelColumn, ANNO_PREFIX);
+                            String suffix = (String) AnnotationUtil.getValue(excelColumn, ANNO_SUFFIX);
                             Class<? extends IWriteConverter> writeConverter =
                                     (Class<? extends IWriteConverter>) AnnotationUtil.getValue(excelColumn,
                                             ANNO_WRITE_CONVERTER);

@@ -15,7 +15,7 @@ public class AnnotationUtil {
             ReflectorUtil.makeAccessible(method);
             return method.invoke(annotation);
         } catch (Exception ex) {
-            return null;
+            throw new RuntimeException("注解 " + annotation.getClass().getName() + "找不到属性: " + attributeName);
         }
     }
 }

@@ -74,19 +74,18 @@ public class Product {
 **第二步:** 调用 `ExcelWriter` 类进行导出操作, write() 方法 会返回一个 `Workbook `对象
 
 ```java
+@Test
+public void testExport() throws IOException {
+    Workbook workbook = ExcelWriter.create(ExcelType.XLS)
+            .sheetName("商品数据")
+            .sheetHeader("--2月份商品数据--")
+            .write(products, Product.class);
 
-		@Test
-    public void testExport() throws IOException {
-        Workbook workbook = ExcelWriter.create(ExcelType.XLS)
-                .sheetName("商品数据")
-                .sheetHeader("--2月份商品数据--")
-                .write(products, Product.class);
-
-        File file = new File(productFile);
-        OutputStream outputStream = new FileOutputStream(file);
-        workbook.write(outputStream);
-        outputStream.close();
-    }
+    File file = new File(productFile);
+    OutputStream outputStream = new FileOutputStream(file);
+    workbook.write(outputStream);
+    outputStream.close();
+}
 ```
 
 导出表格:
@@ -125,15 +124,15 @@ public class Employee {
 **第二步:** 调用 `ExcelReader` 类的方法
 
 ```java
-     @Test
-    public void testImportXls() throws FileNotFoundException {
-        InputStream fileInputStream = new FileInputStream(employeeFile_Xls);
-        List<Employee> employees = ExcelReader
-                .read(fileInputStream, ExcelType.XLS)
-                .startRowNum(1)
-                .to(Employee.class);
-        Assert.assertNotNull(employees);
-    }
+@Test
+public void testImportXls() throws FileNotFoundException {
+    InputStream fileInputStream = new FileInputStream(employeeFile_Xls);
+    List<Employee> employees = ExcelReader
+            .read(fileInputStream, ExcelType.XLS)
+            .startRowNum(1)
+            .to(Employee.class);
+    Assert.assertNotNull(employees);
+}
 ```
 
 # @ExcelColumn 注解参数

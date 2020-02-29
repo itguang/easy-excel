@@ -62,7 +62,7 @@ public class ExcelWriter {
 
     private ExcelWriter(ExcelType excelType) {
         this.excelType = excelType;
-        if (ExcelType.XLS.equals(excelType)) {
+        if (ExcelType.XLS.equals(this.excelType)) {
             workbook = new HSSFWorkbook();
         } else {
             workbook = new XSSFWorkbook();

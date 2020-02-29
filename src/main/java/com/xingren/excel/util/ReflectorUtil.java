@@ -30,7 +30,6 @@ public final class ReflectorUtil {
         addGetMethods(clazz);
         addFields(clazz);
         addSetMethods(clazz);
-        System.out.println();
     }
 
     public static ReflectorUtil forClass(Class<?> clazz) {

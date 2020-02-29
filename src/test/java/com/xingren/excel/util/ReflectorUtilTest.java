@@ -2,7 +2,8 @@ package com.xingren.excel.util;
 
 import com.xingren.excel.annotation.ExcelColumn;
 import com.xingren.excel.entity.Product;
-import org.junit.Before;
+import com.xingren.excel.entity.ReflectorEntity;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.lang.reflect.Field;
@@ -15,17 +16,23 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 public class ReflectorUtilTest {
-    ReflectorUtil reflectorUtil;
+    private static ReflectorUtil productReflectorUtil;
 
-    @Before
-    public void setUp() {
-        reflectorUtil = ReflectorUtil.fromCache(Product.class);
+    @BeforeClass
+    public static void setUp() {
+        productReflectorUtil = ReflectorUtil.fromCache(Product.class);
+
+    }
+
+    @Test
+    public void test_reflect_entity() {
+        ReflectorUtil myReflectorUtil = ReflectorUtil.forClass(ReflectorEntity.class);
     }
 
     @Test
     public void testFilterExcelColumnField() {
 
-        List<Field> fieldList = reflectorUtil.getFieldList();
+        List<Field> fieldList = productReflectorUtil.getFieldList();
 
         List<Field> excelColumnFields = fieldList.stream()
                 .filter(field -> field.isAnnotationPresent(ExcelColumn.class)
@@ -38,7 +45,7 @@ public class ReflectorUtilTest {
     @Test
     public void test_getMethods() {
 
-        Map<String, Method> getMethods = reflectorUtil.getGetMethods();
+        Map<String, Method> getMethods = productReflectorUtil.getGetMethods();
 
         assertNotNull(getMethods.get("id"));
         assertNotNull(getMethods.get("price"));
@@ -48,7 +55,7 @@ public class ReflectorUtilTest {
 
     @Test
     public void test_setMethods() {
-        Map<String, Method> setMethods = reflectorUtil.getSetMethods();
+        Map<String, Method> setMethods = productReflectorUtil.getSetMethods();
 
         assertNotNull(setMethods.get("id"));
         assertNotNull(setMethods.get("price"));

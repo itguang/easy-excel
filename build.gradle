@@ -69,8 +69,6 @@ task copyTestResources(type: Copy) {
 }
 processTestResources.dependsOn copyTestResources
 
-task wrapper(type: Wrapper) {
-    gradleVersion = '4.1'
-}
+
 
 

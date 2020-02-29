@@ -24,5 +24,3 @@ api/src/main/resources/static/docs/
 admin/src/main/resources/static/
 admin/src/main/resources/templates/index.ftl
 # development
-gradle/
-!gradle/wrapper/gradle-wrapper.jar

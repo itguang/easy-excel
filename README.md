@@ -125,11 +125,11 @@ public class Employee {
 
 ```java
 @Test
-public void testImportXls() throws FileNotFoundException {
-    InputStream fileInputStream = new FileInputStream(employeeFile_Xls);
+public void test_import_xlsx() throws FileNotFoundException {
+    InputStream fileInputStream = new FileInputStream(employeeFile_Xlsx);
     List<Employee> employees = ExcelReader
-            .read(fileInputStream, ExcelType.XLS)
-            .startRowNum(1)
+            .read(fileInputStream, ExcelType.XLSX)
+            .columnNameRowNum(1)
             .toPojo(Employee.class);
     Assert.assertNotNull(employees);
 }
@@ -137,7 +137,7 @@ public void testImportXls() throws FileNotFoundException {
 
 # @ExcelColumn 注解参数
 
-@ExcelColumn注解提供了常用的 转换操作,包括**列名定义,列排序,Boolean值转换,前缀后缀,日期格式化,分转元,元转分** 等等.
+`@ExcelColumn`注解提供了常用的 转换操作,包括**列名定义,列排序,Boolean值转换,前缀后缀,日期格式化,分转元,元转分** 等等.
 
 对于更加复杂的转换,提供了转换器接口:
 
@@ -170,6 +170,10 @@ public void testImportXls() throws FileNotFoundException {
 # API
 
 查看 [wiki]()
+
+# 测试
+本项目采用 github action CI 自动构建,每当 master 分支有变动时就会触发构建,运行所有单元测试。
+
 
 # Thanks
 

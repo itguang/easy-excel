@@ -48,7 +48,9 @@ public class ExcelReadService {
         for (RowEntity rowEntity : rowEntityList) {
             T rowObj = (T) ReflectorUtil.reflateInstance(clazz);
             for (ColumnEntity columnEntity : rowEntity.getColumnEntityList()) {
-                parseColumnEntityToRowObj(columnAnnoEntityMap, rowObj, columnEntity);
+                if (!columnEntity.getCell().toString().equals("")) {
+                    parseColumnEntityToRowObj(columnAnnoEntityMap, rowObj, columnEntity);
+                }
             }
             rowDataList.add(rowObj);
         }

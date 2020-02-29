@@ -52,7 +52,7 @@ public class ExcelWriterTest {
     }
 
     @Test
-    public void testExport() throws IOException {
+    public void test_export_xls() throws IOException {
         Workbook workbook = ExcelWriter.create(ExcelType.XLS)
                 .sheetName("商品数据")
                 .sheetHeader("--2月份商品数据--")
@@ -66,7 +66,7 @@ public class ExcelWriterTest {
     }
 
     @Test
-    public void testExportEmployeeTemplate() throws IOException {
+    public void test_export_employee_template() throws IOException {
         Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
                 .sheetName("员工模板表")
                 .sheetHeader("--员工数据--")
@@ -81,7 +81,7 @@ public class ExcelWriterTest {
     }
 
     @Test
-    public void testExportEmpty() throws IOException {
+    public void test_export_empty_xlsx() throws IOException {
         ArrayList<Product> emptyProducts = new ArrayList<>();
         Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
                 .sheetName("空的商品数据")
@@ -97,10 +97,10 @@ public class ExcelWriterTest {
     }
 
     /**
-     * 10000 行数据导出测试 8s 需要优化
+     * 10000 行数据导出测试 7s 需要优化
      */
     @Test
-    public void testExport_1w_xlsx() throws IOException {
+    public void test_export_1w_xlsx() throws IOException {
 
         ArrayList<Product> products = new ArrayList<>();
 
@@ -126,7 +126,7 @@ public class ExcelWriterTest {
     }
 
     @Test
-    public void testGetExcelRowNames() {
+    public void test_get_excel_rowNames() {
         List<ExcelColumnAnnoEntity> excelRowNames =
                 ExcelColumnService.forClass(Product.class).getOrderedExcelColumnEntity();
 
@@ -161,7 +161,7 @@ public class ExcelWriterTest {
     }
 
     @Test
-    public void testSheetName() {
+    public void test_sheetName() {
         String sheetName = "测试 sheet name";
         ExcelWriter excelWriter = ExcelWriter.create(ExcelType.XLSX)
                 .sheetName(sheetName);
@@ -169,23 +169,23 @@ public class ExcelWriterTest {
     }
 
     @Test
-    public void testDefaultSheetName() {
+    public void test_default_sheetName() {
         ExcelWriter excelWriter = ExcelWriter.create(ExcelType.XLSX);
         assertTrue(ExcelConstant.DEFAULT_SHEET_NAME.equals(excelWriter.getSheetName()));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void testSheetNameIsEmpty() {
+    public void test_sheetName_is_empty() {
         ExcelWriter.create(ExcelType.XLSX).sheetName(null);
     }
 
     @Test
-    public void testSheetHeaderIsEmpty() {
+    public void test_sheetHeader_is_empty() {
         assertTrue(StringUtils.isEmpty(ExcelWriter.create(ExcelType.XLSX).getSheetHeader()));
     }
 
     @Test
-    public void testSheetHeader() {
+    public void test_sheetHeader() {
         String sheetHeader = "测试 sheet header";
         ExcelWriter excelWriter = ExcelWriter.create(ExcelType.XLSX).sheetHeader(sheetHeader);
         assertTrue(excelWriter.getSheetHeader().equals(sheetHeader));

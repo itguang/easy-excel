@@ -24,7 +24,7 @@ public class ExcelReader {
     /**
      * 从第几行开始读取(一般用来跳过 sheetHeader )
      */
-    private int startRowNum = 0;
+    private int columnNameRowNum = 0;
 
     /**
      * 读取第几个Sheet
@@ -48,11 +48,10 @@ public class ExcelReader {
     }
 
     /**
-     * 从哪一行(包含 columnTitle )开始读取,第一行为 startRowNum = 0
-     * <Br/> 默从第0行开始读取,并且第0行为 columnTitle
+     * columnName 所在行
      */
-    public ExcelReader startRowNum(int startRowNum) {
-        this.startRowNum = startRowNum;
+    public ExcelReader columnNameRowNum(int columnNameRowNum) {
+        this.columnNameRowNum = columnNameRowNum;
         return this;
     }
 
@@ -68,16 +67,16 @@ public class ExcelReader {
         List<T> rowDataList = null;
         Sheet sheet = workbook.getSheetAt(sheetNum);
         int lastRowIndex = sheet.getLastRowNum();
-        Row columnTitleRow = sheet.getRow(startRowNum++);
+        Row columnTitleRow = sheet.getRow(columnNameRowNum++);
         Row lastRow = sheet.getRow(lastRowIndex);
-        if (columnTitleRow.getLastCellNum() != lastRow.getLastCellNum()) {
+        if (columnTitleRow.getLastCellNum() < lastRow.getLastCellNum()) {
             throw new ExcelException("解析Excel 失败,检查起始 startRowNum 是否设置正确");
         }
 
         String[] columnNames = getColumnNames(columnTitleRow);
 
         ArrayList<RowEntity> rowEntityList = new ArrayList<>();
-        for (int rowNum = startRowNum; rowNum <= lastRowIndex; rowNum++) {
+        for (int rowNum = columnNameRowNum; rowNum <= lastRowIndex; rowNum++) {
             List<ColumnEntity> columnEntityList = new ArrayList<>();
             Row row = sheet.getRow(rowNum);
             for (int curCellNum = row.getFirstCellNum(); curCellNum < row.getLastCellNum(); curCellNum++) {

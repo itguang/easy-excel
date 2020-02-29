@@ -3,7 +3,8 @@ package com.xingren.excel.pojo;
 import com.xingren.excel.converter.read.IReadConverter;
 import com.xingren.excel.converter.write.IWriteConverter;
 import com.xingren.excel.handler.ICellStyleHandler;
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.lang.reflect.Field;
 
@@ -11,7 +12,8 @@ import java.lang.reflect.Field;
  * @author guang
  * @since 2020/2/7 12:18 下午
  */
-@Data
+@Getter
+@Setter
 public class ExcelColumnAnnoEntity {
 
     private Field field;

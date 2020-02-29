@@ -1,11 +1,13 @@
 package com.xingren.excel.entity;
 
 import com.xingren.excel.annotation.ExcelColumn;
+import com.xingren.excel.converter.MyConverter;
 import com.xingren.excel.handler.impl.GreyBgCellStyleHandler;
 import com.xingren.excel.handler.impl.RedFontCellStyleHandler;
 import com.xingren.excel.handler.impl.YellowBgCellStyleHandler;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -16,6 +18,7 @@ import java.time.OffsetDateTime;
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class Product {
 
     @ExcelColumn(columnName = "id", index = 10)
@@ -41,10 +44,7 @@ public class Product {
     @ExcelColumn(columnName = "状态变更日期", index = 55)
     private LocalDateTime updateTime;
 
-    @ExcelColumn(columnName = "备注", index = 70)
+    @ExcelColumn(columnName = "备注", index = 70, writeConverter = MyConverter.class)
     private String other;
 
-    // 导入必须有无参构造器
-    public Product() {
-    }
 }

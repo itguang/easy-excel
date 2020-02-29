@@ -1,4 +1,4 @@
-# easy-excel
+# Easy-Excel
 
 ## 它是什么?
 
@@ -183,7 +183,7 @@ public void test_import_xlsx() throws FileNotFoundException {
 
 # License
 
-[Apache2-LICENSE](https://github.com/itguang/easy-excel/blob/master/LICENSE)
+[Apache2.0](https://github.com/itguang/easy-excel/blob/master/LICENSE)
 
 
 

@@ -179,11 +179,11 @@ public void test_import_xlsx() throws FileNotFoundException {
 
 # Thanks
 
-* Apache POI
+* [Apache POI](https://poi.apache.org/)
 
 # License
 
-[Apache2](https://github.com/biezhi/excel-plus/blob/master/LICENSE)
+[Apache2-LICENSE](https://github.com/itguang/easy-excel/blob/master/LICENSE)
 
 
 

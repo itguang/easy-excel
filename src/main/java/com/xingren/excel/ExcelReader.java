@@ -70,7 +70,7 @@ public class ExcelReader {
         Row columnTitleRow = sheet.getRow(columnNameRowNum++);
         Row lastRow = sheet.getRow(lastRowIndex);
         if (columnTitleRow.getLastCellNum() < lastRow.getLastCellNum()) {
-            throw new ExcelException("解析Excel 失败,检查起始 startRowNum 是否设置正确");
+            throw new ExcelException("解析 Excel 失败,检查 columnNameRowNum 是否设置正确");
         }
 
         String[] columnNames = getColumnNames(columnTitleRow);

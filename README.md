@@ -169,7 +169,7 @@ public void test_import_xlsx() throws FileNotFoundException {
 
 # API
 
-查看 [wiki]()
+查看 [wiki](https://github.com/itguang/easy-excel/wiki)
 
 # 测试
 本项目采用 github action CI 自动构建,每当 master 分支有变动时就会触发构建,运行所有单元测试。

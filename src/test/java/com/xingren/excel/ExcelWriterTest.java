@@ -1,9 +1,8 @@
 package com.xingren.excel;
 
-import com.xingren.excel.entity.Employee;
-import com.xingren.excel.entity.Product;
-import com.xingren.excel.entity.StateEnum;
+import com.xingren.excel.entity.*;
 import com.xingren.excel.enums.ExcelType;
+import com.xingren.excel.exception.ExcelConvertException;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.service.ExcelColumnService;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +23,7 @@ public class ExcelWriterTest {
 
     static ArrayList<Product> products;
     static String productFile_XLS;
+    static String productNoHeaderFile_XLS;
     static String productFile_XLSX;
     static String productEmptyFile_XLSX;
     static String employeeTemplate_XLSX;
@@ -32,6 +32,7 @@ public class ExcelWriterTest {
     public static void before() throws UnsupportedEncodingException {
         ClassLoader classLoader = ExcelWriterTest.class.getClassLoader();
         productFile_XLS = URLDecoder.decode(classLoader.getResource("export/导出商品数据.xls").getPath(), "utf-8");
+        productNoHeaderFile_XLS = URLDecoder.decode(classLoader.getResource("export/no_header.xls").getPath(), "utf-8");
         productFile_XLSX = URLDecoder.decode(classLoader.getResource("export/导出商品数据_1w.xlsx").getPath(), "utf-8");
         productEmptyFile_XLSX = URLDecoder.decode(classLoader.getResource("export/空的商品数据.xlsx").getPath(), "utf-8");
         employeeTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/员工模板表.xlsx").getPath(), "utf-8");
@@ -66,6 +67,19 @@ public class ExcelWriterTest {
     }
 
     @Test
+    public void test_export_no_sheet_header_xls() throws IOException {
+        Workbook workbook = ExcelWriter.create(ExcelType.XLS)
+                .sheetName("商品数据")
+                .write(products, Product.class);
+
+        File file = new File(productNoHeaderFile_XLS);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+
+    }
+
+    @Test
     public void test_export_employee_template() throws IOException {
         Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
                 .sheetName("员工模板表")
@@ -78,6 +92,16 @@ public class ExcelWriterTest {
         workbook.write(outputStream);
         outputStream.close();
 
+    }
+
+    @Test(expected = ExcelConvertException.class)
+    public void test_export_no_enumKey() {
+        Person person = new Person("小李", Gender.MALE);
+        ArrayList<Person> persons = new ArrayList<>();
+        persons.add(person);
+        Workbook workbook = ExcelWriter.create(ExcelType.XLS)
+                .sheetName("人员数据")
+                .write(persons, Person.class);
     }
 
     @Test

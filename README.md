@@ -174,8 +174,10 @@ public void test_import_xlsx() throws FileNotFoundException {
 # 测试
 本项目采用 github action CI 自动构建,每当 master 分支有变动时就会触发构建,运行所有单元测试。
 
-目前的测试报告：
-![3sRW6A.png](https://s2.ax1x.com/2020/02/29/3sRW6A.png)
+目前的 jacoco 测试报告：
+
+![3sRW6A.png](![3cQy1H.png](https://s2.ax1x.com/2020/03/01/3cQy1H.png))
+
 
 # Thanks
 

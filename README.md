@@ -168,7 +168,7 @@ public void test_import_xlsx() throws FileNotFoundException {
 | prefix                     | 前缀                                                         |
 | suffix                     | 后缀                                                         |
 | centToYuan                 | 是否启用 分转元(仅对导出有效) ,仅支持 Integer 和 Long 类型   |
-| yuanToCent                 | 是否启用 元转分(仅对导入有效),仅支持 Integer 和 Long 类型    |
+| yuanToCent                  | 是否启用 元转分(仅对导入有效),仅支持 Integer 和 Long 类型    |
 | writeConverter             | 导出转换器                                                   |
 | readConverter              | 导入转换器                                                   |
 | cellStyleHandler           | rowData 样式处理器                                           |

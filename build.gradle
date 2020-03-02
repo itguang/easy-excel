@@ -17,9 +17,6 @@ def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/
 repositories {
     mavenLocal()
     maven {
-        url 'http://nexus.aihaisi.com/repository/public/'
-    }
-    maven {
         url 'https://plugins.gradle.org/m2/'
     }
     jcenter()

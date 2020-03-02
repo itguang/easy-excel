@@ -2,10 +2,12 @@ plugins {
     id 'java'
     id 'maven'
     id 'jacoco'
+    id 'signing'
+    id 'maven-publish'
 }
 
 group 'com.xingren'
-version '1.0-SNAPSHOT'
+version '1.0-RELEASE'
 
 sourceCompatibility = 1.8
 
@@ -53,6 +55,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.2'
     testCompileOnly 'org.projectlombok:lombok:1.18.2'
 
+
 }
 
 jacocoTestReport {
@@ -70,5 +73,83 @@ task copyTestResources(type: Copy) {
 processTestResources.dependsOn copyTestResources
 
 
+// 发布到 maven 中央仓库
+// -------------------------------------------------------------------------
+task sourcesJar(type: Jar) {
+    from sourceSets.main.allJava
+    classifier = 'sources'
+}
 
+task javadocJar(type: Jar) {
+    from javadoc
+    classifier = 'javadoc'
+}
 
+tasks.withType(Javadoc) {
+    failOnError false
+    options.addStringOption('Xdoclint:none', '-quiet')
+    options.addStringOption('encoding', 'UTF-8')
+    options.addStringOption('charSet', 'UTF-8')
+}
+
+javadoc {
+    options {
+        encoding "UTF-8"
+        charSet 'UTF-8'
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            groupId 'io.github.itguang'
+            artifactId project.name
+            version "${version}"
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+
+            // https://docs.gradle.org/current/dsl/org.gradle.api.publish.maven.MavenPublication.html
+            pom {
+                name = "easy-excel"
+                description = "easy-excel 是基于 Apache POI 框架的一款扩展封装库"
+                url = "https://github.com/itguang/easy-excel"
+                licenses {
+                    license {
+                        name = "The Apache License, Version 2.0"
+                        url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+                    }
+                }
+                developers {
+                    developer {
+                        id = "itguang"
+                        name = "李增光"
+                        email = "itguang@qq.com"
+                    }
+                }
+                scm {
+                    connection = "scm:git:https://github.com/itguang/easy-excel"
+                    developerConnection = "scm:git:https://github.com/itguang/easy-excel"
+                    url = "https://github.com/itguang/easy-excel"
+                }
+            }
+        }
+    }
+    repositories {
+        maven {
+            def releasesRepoUrl = "https://oss.sonatype.org/service/local/staging/deploy/maven2"
+            def snapshotsRepoUrl = "https://oss.sonatype.org/content/repositories/snapshots"
+            // 如果version以SNAPSHOT结尾就会上传到快照仓库，如果不是就上传到release仓库
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+            credentials {
+                username = "${NEXUS_USERNAME}"
+                password = "${NEXUS_PASSWORD}"
+            }
+        }
+
+    }
+}
+
+signing {
+    sign publishing.publications.mavenJava
+}

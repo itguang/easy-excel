@@ -11,11 +11,8 @@ import org.apache.poi.ss.usermodel.Workbook;
 public interface ICellStyleHandler {
 
     /**
-     * <p>
-     *
-     * <p>
      * 需要注意的是, xlsx 格式的 excel 文件中 做多只允许创建 64000 个CellStyle
-     * </p>
+     *
      *
      * @param workbook  工作簿
      * @param cellStyle cellStyle 默认样式垂直水平居中,可再次基础上进行样式调整

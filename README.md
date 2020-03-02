@@ -28,7 +28,14 @@ easy-excel 很大程度上简化了代码、让使用者更轻松的 读、写 E
 
 ### 引入依赖
 
->  还没有
+```xml
+<dependency>
+  <groupId>io.github.itguang</groupId>
+  <artifactId>easy-excel</artifactId>
+  <version>1.0-RELEASE</version>
+</dependency>
+
+```
 
 ### 导出
 

@@ -28,6 +28,7 @@ easy-excel 很大程度上简化了代码、让使用者更轻松的 读、写 E
 
 ### 引入依赖
 
+* Apache Maven
 ```xml
 <dependency>
   <groupId>io.github.itguang</groupId>
@@ -36,6 +37,15 @@ easy-excel 很大程度上简化了代码、让使用者更轻松的 读、写 E
 </dependency>
 
 ```
+* Gradle Groovy DSL
+```groovy
+implementation 'io.github.itguang:easy-excel:1.0-RELEASE'
+```
+* Gradle Kotlin DSL
+```kotlin
+implementation("io.github.itguang:easy-excel:1.0-RELEASE")
+```
+
 
 ### 导出
 

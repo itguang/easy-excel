@@ -10,7 +10,7 @@ import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 public class DefaultReadConverter implements IReadConverter {
 
     @Override
-    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue) {
+    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue,Object rowObj) {
         throw new UnsupportedOperationException("该类属于注解默认参数,不可实例化");
     }
 }

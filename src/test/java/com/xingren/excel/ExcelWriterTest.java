@@ -27,6 +27,9 @@ public class ExcelWriterTest {
     static String productFile_XLSX;
     static String productEmptyFile_XLSX;
     static String employeeTemplate_XLSX;
+    static String orderTemplate_XLSX;
+    static String orderWithErrorInfo_XLSX;
+    static String orderNoErrorInfo_XLSX;
 
     @BeforeClass
     public static void before() throws UnsupportedEncodingException {
@@ -36,6 +39,9 @@ public class ExcelWriterTest {
         productFile_XLSX = URLDecoder.decode(classLoader.getResource("export/导出商品数据_1w.xlsx").getPath(), "utf-8");
         productEmptyFile_XLSX = URLDecoder.decode(classLoader.getResource("export/空的商品数据.xlsx").getPath(), "utf-8");
         employeeTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/员工模板表.xlsx").getPath(), "utf-8");
+        orderTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/订单模板表.xlsx").getPath(), "utf-8");
+        orderWithErrorInfo_XLSX = URLDecoder.decode(classLoader.getResource("export/订单错误信息.xlsx").getPath(), "utf-8");
+        orderNoErrorInfo_XLSX = URLDecoder.decode(classLoader.getResource("export/订单没有错误信息.xlsx").getPath(), "utf-8");
 
         Product apple = new Product(1000,
                 1000L, OffsetDateTime.now(),
@@ -213,6 +219,57 @@ public class ExcelWriterTest {
         String sheetHeader = "测试 sheet header";
         ExcelWriter excelWriter = ExcelWriter.create(ExcelType.XLSX).sheetHeader(sheetHeader);
         assertTrue(excelWriter.getSheetHeader().equals(sheetHeader));
+    }
+
+    @Test
+    public void test_write_order_template() throws Exception {
+        String sheetHeader = "继承了 ErrorInfoRow 的模板导出";
+        Workbook workbook = ExcelWriter.create().sheetHeader(sheetHeader).writeTemplate(OrderEntity.class);
+
+        File file = new File(orderTemplate_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+    }
+
+    @Test
+    public void test_write_order_with_error_info() throws Exception {
+
+        ArrayList<OrderEntity> orderEntities = new ArrayList<>();
+        orderEntities.add(new OrderEntity(1, "45674567890-jk"));
+        orderEntities.add(new OrderEntity(2, "345678907890-jk"));
+        orderEntities.add(new OrderEntity(2, "345678907890-jk"));
+
+        orderEntities.forEach(orderEntity -> {
+            StringBuilder sb = new StringBuilder();
+            sb.append("订单号[" + orderEntity.getOrderNo() + "]不对! \n");
+            orderEntity.setErrorInfo(sb.toString());
+        });
+
+        String sheetHeader = "继承了 ErrorInfoRow 的导出";
+        Workbook workbook = ExcelWriter.create().sheetHeader(sheetHeader).write(orderEntities, OrderEntity.class);
+
+        File file = new File(orderWithErrorInfo_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+    }
+
+    @Test
+    public void test_write_no_error_order() throws Exception {
+
+        ArrayList<OrderEntity> orderEntities = new ArrayList<>();
+        orderEntities.add(new OrderEntity(1, "45674567890-jk"));
+        orderEntities.add(new OrderEntity(2, "345678907890-jk"));
+        orderEntities.add(new OrderEntity(2, "345678907890-jk"));
+
+        String sheetHeader = "继承了 ErrorInfoRow 的导出";
+        Workbook workbook = ExcelWriter.create().sheetHeader(sheetHeader).write(orderEntities, OrderEntity.class);
+
+        File file = new File(orderNoErrorInfo_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
     }
 
 }

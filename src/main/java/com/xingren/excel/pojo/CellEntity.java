@@ -6,17 +6,28 @@ import lombok.Setter;
 import org.apache.poi.ss.usermodel.Cell;
 
 /**
+ * 单个Cell 实体类
+ *
  * @author guang
  * @since 2020/2/10 6:49 下午
  */
 @Getter
 @Setter
 @AllArgsConstructor
-public class ColumnEntity {
+public class CellEntity {
 
+    /**
+     * 当前 Cell 对象
+     */
     private Cell cell;
 
-    private String columnName;
+    /**
+     * 注解字段名称
+     */
+    private String cellName;
 
-    private String columnValue;
+    /**
+     * 导入 excel 中的 cell 值
+     */
+    private String cellValue;
 }

@@ -15,6 +15,6 @@ import java.util.List;
 @AllArgsConstructor
 public class RowEntity {
 
-    private List<ColumnEntity> columnEntityList;
+    private List<CellEntity> cellEntityList;
 
 }

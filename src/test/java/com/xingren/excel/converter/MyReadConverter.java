@@ -9,7 +9,7 @@ import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
  */
 public class MyReadConverter implements IReadConverter {
     @Override
-    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue) {
+    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue, Object rowObj) {
         return "[" + cellValue + "]";
     }
 }

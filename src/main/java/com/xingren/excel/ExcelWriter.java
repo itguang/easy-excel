@@ -2,6 +2,7 @@ package com.xingren.excel;
 
 import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.exception.ExcelException;
+import com.xingren.excel.pojo.ErrorInfoRow;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.service.ExcelColumnService;
 import com.xingren.excel.service.write.ExcelWriteService;
@@ -17,8 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.xingren.excel.ExcelConstant.DEFAULT_SHEET_NAME;
-import static com.xingren.excel.ExcelConstant.columnDataRowHeight;
+import static com.xingren.excel.ExcelConstant.*;
 
 /**
  * @author guang
@@ -84,7 +84,7 @@ public class ExcelWriter {
      * @param clazz java Entity Class
      * @return workBook
      */
-    public <T> Workbook write(List<T> rows, Class<?> clazz) {
+    public <T> Workbook write(List<T> rows, Class<T> clazz) {
         if (CollectionUtils.isEmpty(rows)) {
             rows = Collections.emptyList();
         }
@@ -99,43 +99,68 @@ public class ExcelWriter {
         Sheet sheet = workbook.createSheet(sheetName);
         sheet.autoSizeColumn(rowIndex);
 
+        // 是否需要动态删除最后一列(ErrorInfoRow)
+        boolean needMinusLastColumn = isNeedMinusLastColumn(rows, clazz);
+
         // 创建表格头
         if (StringUtils.isNotEmpty(sheetHeader)) {
-            excelWriteService.createSheetHeader(workbook, rowIndex, sheetHeader, sheet);
+            excelWriteService.createSheetHeader(workbook, rowIndex, sheetHeader, sheet, needMinusLastColumn);
             rowIndex = rowIndex + 1;
         }
 
         // 创建列标题
         List<ExcelColumnAnnoEntity> annoEntities = ExcelColumnService.forClass(clazz).getOrderedExcelColumnEntity();
         if (CollectionUtils.isNotEmpty(annoEntities)) {
-            createColumnTitle(rowIndex, sheet, annoEntities);
+            createColumnTitle(rowIndex, sheet, annoEntities, needMinusLastColumn);
         }
 
         // 创建 rows
         CellStyle style = ExcelConstant.defaultDataRowStyle(workbook);
         for (Object rowData : rows) {
+            // 增加一行
             Row row = sheet.createRow(++rowIndex);
-            insertRowData(annoEntities, rowData, row);
+            insertRowData(annoEntities, rowData, row, needMinusLastColumn, sheet);
+
+            // 样式设置
             row.setRowStyle(style);
             row.setHeightInPoints(columnDataRowHeight);
+
         }
 
         workbook.setActiveSheet(activeSheet);
         return workbook;
     }
 
+    private <T> boolean isNeedMinusLastColumn(List<T> rows, Class<T> clazz) {
+
+        // 是否继承自 isErrorInfoRow
+        boolean isErrorInfoRow = isErrorInfoRow(clazz);
+
+        // 是否有错误信息
+        boolean hasErrorInfo = hasErrorInfo(rows, clazz);
+
+        return isErrorInfoRow && !hasErrorInfo;
+    }
+
     private void insertRowData(List<ExcelColumnAnnoEntity> annoEntities,
-                               Object rowData, Row row) {
-        for (int i = 0; i < annoEntities.size(); i++) {
-            ExcelColumnAnnoEntity entity = annoEntities.get(i);
-            Cell cell = row.createCell(i);
-            //TODO # guang 待优化
+                               Object rowData, Row row, boolean needMinusLastColumn, Sheet sheet) {
+        // 计算有效的列
+        int columnSize = calcColumnSize(annoEntities, needMinusLastColumn);
+        for (int columnNum = 0; columnNum < columnSize; columnNum++) {
+            ExcelColumnAnnoEntity entity = annoEntities.get(columnNum);
+            Cell currentCell = row.createCell(columnNum);
+
+            //  Cell 样式设置
             CellStyle defaultCellStyle = getDefaultCellStyle(entity);
             defaultCellStyle = entity.getCellStyleHandler().handle(workbook, defaultCellStyle, rowData, entity);
-            //  Cell 样式设置
-            cell.setCellStyle(defaultCellStyle);
-            Object value = excelWriteService.parseFieldValue(rowData, entity, cell);
-            cell.setCellValue(value == null ? "" : value.toString());
+            currentCell.setCellStyle(defaultCellStyle);
+            // 值设置
+            Object value = excelWriteService.parseFieldValue(rowData, entity, currentCell);
+            String cellValue = value == null ? "" : value.toString();
+            currentCell.setCellValue(cellValue);
+
+            // 设置自动列宽
+            excelWriteService.autoCellWidth(sheet, columnNum, cellValue);
 
         }
     }
@@ -154,14 +179,17 @@ public class ExcelWriter {
     /**
      * 创建 ColumnTitle 并设置宽度自适应
      */
-    private void createColumnTitle(int rowIndex, Sheet sheet, List<ExcelColumnAnnoEntity> annoEntities) {
+    private <T> void createColumnTitle(int rowIndex, Sheet sheet, List<ExcelColumnAnnoEntity> annoEntities,
+                                       boolean needMinusLastColumn) {
+
         Row row = sheet.createRow(rowIndex);
         row.setRowStyle(ExcelConstant.defaultColumnNameStyle(workbook));
         // ColumnName 高度设置
         row.setHeightInPoints(ExcelConstant.columnTitleRowHeight);
 
-        for (int columnNum = 0; columnNum < annoEntities.size(); columnNum++) {
-            int columnWidth = sheet.getColumnWidth(columnNum) / 256;
+        // 一共有多少有效的列
+        int columnSize = calcColumnSize(annoEntities, needMinusLastColumn);
+        for (int columnNum = 0; columnNum < columnSize; columnNum++) {
             ExcelColumnAnnoEntity annoEntity = annoEntities.get(columnNum);
 
             Cell currentCell = row.createCell(columnNum);
@@ -172,16 +200,49 @@ public class ExcelWriter {
             if (null != columnCellStyle) {
                 currentCell.setCellStyle(columnCellStyle);
             }
-            currentCell.setCellValue(annoEntity.getColumnName());
 
-            // 自动列宽
-            int length = currentCell.getStringCellValue().getBytes().length;
-            if (columnWidth < length) {
-                columnWidth = length;
+            String columnName = annoEntity.getColumnName();
+            // 根据是否是 ErrorInfoRow 类型来选择是否需要 错误信息 列
+            if (needMinusLastColumn && ERROR_COLUMN_NAME.equals(columnName)) {
+                continue;
             }
-            sheet.setColumnWidth(columnNum, columnWidth * 256);
+            currentCell.setCellValue(columnName);
+            // 自动列宽
+            excelWriteService.autoCellWidth(sheet, columnNum, columnName);
         }
 
+    }
+
+    /**
+     * 计算有效列数
+     */
+    private int calcColumnSize(List<ExcelColumnAnnoEntity> annoEntities, boolean needMinusLastColumn) {
+        int columnSize = annoEntities.size();
+        if (needMinusLastColumn) {
+            columnSize = columnSize - 1;
+        }
+        return columnSize;
+    }
+
+    private <T> boolean hasErrorInfo(List<T> rows, Class<T> clazz) {
+        //是否是 ErrorInfoRow 的子类
+        boolean isErrorInfoRow = isErrorInfoRow(clazz);
+        if (!isErrorInfoRow) {
+            return false;
+        }
+        List<ErrorInfoRow> errorInfoRows = (List<ErrorInfoRow>) rows;
+        return errorInfoRows.stream()
+                .map(ErrorInfoRow::getErrorInfo)
+                .filter(errorInfo -> StringUtils.isNotEmpty(errorInfo))
+                .findFirst().isPresent();
+    }
+
+    /**
+     * 是否是 ErrorInfoRow 的子类
+     */
+    private <T> boolean isErrorInfoRow(Class<T> clazz) {
+        boolean assignableFrom = ErrorInfoRow.class.isAssignableFrom(clazz);
+        return assignableFrom;
     }
 
     public static ExcelWriter create(ExcelType excelType) {

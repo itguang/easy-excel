@@ -1,7 +1,9 @@
 package com.xingren.excel.service.read;
 
 import com.xingren.excel.converter.read.impl.EnumReadConverter;
-import com.xingren.excel.pojo.ColumnEntity;
+import com.xingren.excel.exception.ExcelException;
+import com.xingren.excel.pojo.CellEntity;
+import com.xingren.excel.pojo.ErrorInfoRow;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.pojo.RowEntity;
 import com.xingren.excel.service.ExcelColumnService;
@@ -43,13 +45,14 @@ public class ExcelReadService {
     }
 
     public <T> List<T> parseRowEntity(ArrayList<RowEntity> rowEntityList) {
-        Map<String, ExcelColumnAnnoEntity> columnAnnoEntityMap = getColumnAnnoEntityMap();
+        Map<String, ExcelColumnAnnoEntity> columnNameAnnoEntityMap = getColumnAnnoEntityMap();
         List<T> rowDataList = new ArrayList<>(rowEntityList.size());
         for (RowEntity rowEntity : rowEntityList) {
             T rowObj = (T) ReflectorUtil.reflateInstance(clazz);
-            for (ColumnEntity columnEntity : rowEntity.getColumnEntityList()) {
-                if (!columnEntity.getCell().toString().equals("")) {
-                    parseColumnEntityToRowObj(columnAnnoEntityMap, rowObj, columnEntity);
+            for (CellEntity cellEntity : rowEntity.getCellEntityList()) {
+                if (!cellEntity.getCell().toString().equals("")) {
+                    ExcelColumnAnnoEntity annoEntity = columnNameAnnoEntityMap.get(cellEntity.getCellName());
+                    parseColumnEntityToRowObj(annoEntity, rowObj, cellEntity);
                 }
             }
             rowDataList.add(rowObj);
@@ -57,19 +60,18 @@ public class ExcelReadService {
         return rowDataList;
     }
 
-    private <T> void parseColumnEntityToRowObj(Map<String, ExcelColumnAnnoEntity> columnAnnoEntityMap,
-                                               T rowObj, ColumnEntity columnEntity) {
+    private <T> void parseColumnEntityToRowObj(ExcelColumnAnnoEntity annoEntity, T rowObj, CellEntity cellEntity) {
         Map<String, Method> fieldNameSetMethodMap = reflectorUtil.getSetMethods();
-        ExcelColumnAnnoEntity annoEntity = columnAnnoEntityMap.get(columnEntity.getColumnName());
+
         // 如果在 Excel 中的字段在 POJO 中没有相应注解,跳过设值
         if (null == annoEntity) {
             return;
         }
         Method setMethod = fieldNameSetMethodMap.get(annoEntity.getFiledName());
-        String columnValue = columnEntity.getColumnValue();
+        String columnValue = cellEntity.getCellValue();
         Class<?> fieldType = annoEntity.getField().getType();
         if (null != annoEntity.getReadConverter()) {
-            Object fieldValue = annoEntity.getReadConverter().convert(annoEntity, clazz, columnValue);
+            Object fieldValue = annoEntity.getReadConverter().convert(annoEntity, clazz, columnValue, rowObj);
             invokeSetMethod(rowObj, setMethod, fieldValue, fieldType);
             return;
         }
@@ -103,13 +105,13 @@ public class ExcelReadService {
         // 枚举处理
         if (fieldType.isEnum()) {
             // Enum 实例
-            Object enumObj = new EnumReadConverter().convert(annoEntity, clazz, columnValue);
+            Object enumObj = new EnumReadConverter().convert(annoEntity, clazz, columnValue, rowObj);
             invokeSetMethod(rowObj, setMethod, enumObj, fieldType);
         }
         // OffsetDateTime 处理
         if (OffsetDateTime.class.equals(fieldType)) {
             if (StringUtils.isNotEmpty(columnValue)) {
-                Cell cell = columnEntity.getCell();
+                Cell cell = cellEntity.getCell();
                 OffsetDateTime offsetDateTime = null;
                 if (cell.getCellTypeEnum().equals(NUMERIC)) {
                     offsetDateTime = DateUtil.parseToOffsetDateTime(columnValue, DEFAULT_DATE_PATTREN);
@@ -122,7 +124,7 @@ public class ExcelReadService {
         }
         // LocalDateTime 处理
         if (LocalDateTime.class.equals(fieldType)) {
-            Cell cell = columnEntity.getCell();
+            Cell cell = cellEntity.getCell();
             LocalDateTime localDateTime = null;
             if (cell.getCellTypeEnum().equals(NUMERIC)) {
                 localDateTime = DateUtil.parseToLocalDateTime(columnValue, DEFAULT_DATE_PATTREN);
@@ -157,12 +159,21 @@ public class ExcelReadService {
         if (Long.class.equals(fieldType)) {
             Long longValue = doubleValue.longValue();
             invokeSetMethod(rowObj, setMethod, longValue, fieldType);
-
         }
     }
 
     private <T> void invokeSetMethod(T rowObj, Method setMethod, Object setValue, Class<?> setClass) {
-        ReflectorUtil.invokeSetMethod(rowObj, setMethod, setValue, setClass);
+        try {
+            ReflectorUtil.invokeSetMethod(rowObj, setMethod, setValue, setClass);
+        } catch (Exception e) {
+            // 是否需要出错信息进行捕获
+            if (rowObj instanceof ErrorInfoRow) {
+                ErrorInfoRow errorRow = (ErrorInfoRow) rowObj;
+                errorRow.setErrorInfo(e.getMessage() + "\n") ;
+            } else {
+                throw new ExcelException(e.getMessage());
+            }
+        }
     }
 
     private Map<String, ExcelColumnAnnoEntity> getColumnAnnoEntityMap() {

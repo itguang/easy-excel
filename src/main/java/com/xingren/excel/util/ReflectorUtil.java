@@ -188,6 +188,9 @@ public final class ReflectorUtil {
 
     private void addFields(Class<?> clazz) {
         Field[] fields = clazz.getDeclaredFields();
+//        // 接口 字段
+//        Field[] iFields = clazz.getFields();
+//        CollectionUtils.addAll(fieldList, iFields);
         for (Field field : fields) {
             if (canAccessPrivateMethods()) {
                 try {

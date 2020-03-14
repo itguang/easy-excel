@@ -49,6 +49,8 @@ public interface ExcelConstant {
 
     String DEFAULT_DATE_PATTREN = "yyyy/MM/dd";
 
+    String ERROR_COLUMN_NAME = "错误信息";
+
     /**
      * sheet header 列高
      */
@@ -77,6 +79,7 @@ public interface ExcelConstant {
         headerCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         headerCellStyle.setWrapText(true);
         Font font = workbook.createFont();
+        font.setFontName(DEFAULT_FONT_NAME);
         font.setFontHeightInPoints((short) sheetHeaderRowFontSize);
         font.setBold(true);
         headerCellStyle.setFont(font);
@@ -92,7 +95,8 @@ public interface ExcelConstant {
         headerCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         headerCellStyle.setWrapText(true);
         Font font = workbook.createFont();
-        font.setBold(true);
+        font.setFontName(DEFAULT_FONT_NAME);
+//        font.setBold(true);
         headerCellStyle.setFont(font);
         return headerCellStyle;
     }
@@ -105,6 +109,9 @@ public interface ExcelConstant {
         cellStyle.setAlignment(HorizontalAlignment.CENTER);
         cellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
         cellStyle.setWrapText(true);
+        Font font = workbook.createFont();
+        font.setFontName(DEFAULT_FONT_NAME);
+        cellStyle.setFont(font);
         return cellStyle;
     }
 

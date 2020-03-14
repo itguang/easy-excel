@@ -2,7 +2,7 @@ package com.xingren.excel;
 
 import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.exception.ExcelException;
-import com.xingren.excel.pojo.ColumnEntity;
+import com.xingren.excel.pojo.CellEntity;
 import com.xingren.excel.pojo.RowEntity;
 import com.xingren.excel.service.read.ExcelReadService;
 import com.xingren.excel.service.read.MyDataFormatter;
@@ -77,16 +77,17 @@ public class ExcelReader {
 
         ArrayList<RowEntity> rowEntityList = new ArrayList<>();
         for (int rowNum = columnNameRowNum; rowNum <= lastRowIndex; rowNum++) {
-            List<ColumnEntity> columnEntityList = new ArrayList<>();
+            List<CellEntity> cellEntityList = new ArrayList<>();
             Row row = sheet.getRow(rowNum);
             for (int curCellNum = row.getFirstCellNum(); curCellNum < row.getLastCellNum(); curCellNum++) {
                 String columnName = columnNames[curCellNum];
                 Cell cell = row.getCell(curCellNum);
+                // 先统一转换成 String 类型的值,后面再根据 pojo 对应的字段类型进项转换
                 String columnValue = formatter.formatCellValue(cell);
-                ColumnEntity columnEntity = new ColumnEntity(cell, columnName, columnValue);
-                columnEntityList.add(columnEntity);
+                CellEntity cellEntity = new CellEntity(cell, columnName, columnValue);
+                cellEntityList.add(cellEntity);
             }
-            rowEntityList.add(new RowEntity(columnEntityList));
+            rowEntityList.add(new RowEntity(cellEntityList));
         }
         rowDataList = ExcelReadService.forClass(clazz).parseRowEntity(rowEntityList);
 

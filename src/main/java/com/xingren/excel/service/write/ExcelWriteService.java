@@ -97,18 +97,40 @@ public class ExcelWriteService<T> {
         return excelColumnFields;
     }
 
-    public void createSheetHeader(Workbook workbook, int rowIndex, String sheetHeader, Sheet sheet) {
+    public void createSheetHeader(Workbook workbook, int rowIndex, String sheetHeader, Sheet sheet,
+                                  boolean needMinusLastColumn) {
         List<Field> excelField = filterExcelField(reflectorUtil.getFieldList());
+
         if (CollectionUtils.isEmpty(excelField)) {
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 0));
         } else {
-            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, excelField.size() - 1));
+            int lastCol = excelField.size() - 1;
+            if (needMinusLastColumn) {
+                lastCol = lastCol - 1;
+            }
+            sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, lastCol));
         }
         Row row0 = sheet.createRow(rowIndex);
         Cell header = row0.createCell(0);
         header.setCellValue(sheetHeader);
         header.setCellStyle(ExcelConstant.defaultHeaderRowStyle(workbook));
         row0.setHeightInPoints(sheetHeaderRowHeight);
+
+        // 自动列宽
+        autoCellWidth(sheet, rowIndex, sheetHeader);
+    }
+
+    /**
+     * 设置自动列宽
+     */
+    public void autoCellWidth(Sheet sheet, int columnNum, String cellValue) {
+        // 自动列宽
+        int columnWidth = sheet.getColumnWidth(columnNum) / 256;
+        int length = cellValue.getBytes().length;
+        if (columnWidth < length) {
+            columnWidth = length;
+        }
+        sheet.setColumnWidth(columnNum, columnWidth * 256);
     }
 
 }

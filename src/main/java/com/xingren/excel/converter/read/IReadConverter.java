@@ -8,7 +8,8 @@ public interface IReadConverter {
      * @param entity    Column 注解 实体
      * @param clazz     row class
      * @param cellValue cellValue
+     * @param rowObj    rowObj
      * @return 转换后的值
      */
-    Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue);
+    Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue, Object rowObj);
 }

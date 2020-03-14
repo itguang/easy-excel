@@ -20,7 +20,7 @@ public class EnumReadConverter implements IReadConverter {
     private static Map<Class, Map<String, Object>> classEnmuObj = new HashMap<>();
 
     @Override
-    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue) {
+    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue, Object rowObj) {
         Class<?> fieldType = entity.getField().getType();
         if (!fieldType.isEnum()) {
             throw new ExcelConvertException("类 " + clazz.getName() + " 中字段:"

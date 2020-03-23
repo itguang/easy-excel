@@ -48,6 +48,8 @@ public class ExcelColumnAnnoEntity {
 
     private Boolean yuanToCent;
 
+    private Boolean required;
+
     private String prefix;
 
     private String suffix;

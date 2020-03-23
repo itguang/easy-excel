@@ -1,8 +1,11 @@
 package com.xingren.excel;
 
+import com.xingren.excel.entity.Book;
+import com.xingren.excel.entity.BookNoError;
 import com.xingren.excel.entity.Employee;
 import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.exception.ExcelException;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -13,6 +16,8 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author guang
@@ -21,6 +26,8 @@ import java.util.List;
 public class ExcelReaderTest {
 
     private static String employeeFile_Xlsx;
+    private static String bookFile_Xlsx;
+    private static String bookEnumFile_Xlsx;
     private static String employeeFile_Xls;
     private static String employeeEmptyFile_Xls;
     private static String employeeFile_1w_Xlsx;
@@ -29,6 +36,8 @@ public class ExcelReaderTest {
     public static void before() throws UnsupportedEncodingException {
         ClassLoader classLoader = ExcelReaderTest.class.getClassLoader();
         employeeFile_Xls = URLDecoder.decode(classLoader.getResource("read/员工数据.xls").getPath(), "utf-8");
+        bookFile_Xlsx = URLDecoder.decode(classLoader.getResource("read/图书数据.xlsx").getPath(), "utf-8");
+        bookEnumFile_Xlsx = URLDecoder.decode(classLoader.getResource("read/图书数据-枚举值为空.xlsx").getPath(), "utf-8");
         employeeEmptyFile_Xls = URLDecoder.decode(classLoader.getResource("read/空员工数据.xls").getPath(), "utf-8");
         employeeFile_Xlsx = URLDecoder.decode(classLoader.getResource("read/员工数据.xlsx").getPath(), "utf-8");
         employeeFile_1w_Xlsx = URLDecoder.decode(classLoader.getResource("read/员工数据_1w.xlsx").getPath(), "utf-8");
@@ -93,6 +102,38 @@ public class ExcelReaderTest {
                 .columnNameRowNum(1)
                 .toPojo(Employee.class);
         Assert.assertNotNull(employees);
+    }
+
+    @Test
+    public void test_import_requied() throws FileNotFoundException {
+        InputStream fileInputStream = new FileInputStream(bookFile_Xlsx);
+        List<Book> books = ExcelReader
+                .read(fileInputStream)
+                .toPojo(Book.class);
+
+        Optional<Book> errorBook =
+                books.stream().filter(book -> StringUtils.isNotBlank(book.getErrorInfo())).findFirst();
+        Assert.assertTrue(errorBook.isPresent());
+    }
+
+    @Test
+    public void test_import_enum_value_is_null_error_row() throws FileNotFoundException {
+        InputStream fileInputStream = new FileInputStream(bookEnumFile_Xlsx);
+        List<Book> books = ExcelReader
+                .read(fileInputStream)
+                .toPojo(Book.class);
+        List<Book> bookList =
+                books.stream().filter(book -> StringUtils.isNotBlank(book.getErrorInfo())).collect(Collectors.toList());
+        Assert.assertTrue(bookList.size() == 1);
+    }
+
+    @Test(expected = ExcelException.class)
+    public void test_import_enum_value_is_null() throws FileNotFoundException {
+        InputStream fileInputStream = new FileInputStream(bookEnumFile_Xlsx);
+        List<BookNoError> books = ExcelReader
+                .read(fileInputStream)
+                .toPojo(BookNoError.class);
+
     }
 
 }

@@ -79,6 +79,9 @@ public class ExcelWriteService<T> {
 
         try {
             Object value = getMethod.invoke(rowData);
+            if (null == value) {
+                return null;
+            }
             return entity.getPrefix() + value + entity.getSuffix();
         } catch (IllegalAccessException e) {
             e.printStackTrace();

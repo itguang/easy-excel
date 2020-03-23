@@ -27,6 +27,7 @@ public class ExcelWriterTest {
     static String productFile_XLSX;
     static String productEmptyFile_XLSX;
     static String employeeTemplate_XLSX;
+    static String bookTemplate_XLSX;
     static String orderTemplate_XLSX;
     static String orderWithErrorInfo_XLSX;
     static String orderNoErrorInfo_XLSX;
@@ -39,6 +40,7 @@ public class ExcelWriterTest {
         productFile_XLSX = URLDecoder.decode(classLoader.getResource("export/导出商品数据_1w.xlsx").getPath(), "utf-8");
         productEmptyFile_XLSX = URLDecoder.decode(classLoader.getResource("export/空的商品数据.xlsx").getPath(), "utf-8");
         employeeTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/员工模板表.xlsx").getPath(), "utf-8");
+        bookTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/图书模板表.xlsx").getPath(), "utf-8");
         orderTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/订单模板表.xlsx").getPath(), "utf-8");
         orderWithErrorInfo_XLSX = URLDecoder.decode(classLoader.getResource("export/订单错误信息.xlsx").getPath(), "utf-8");
         orderNoErrorInfo_XLSX = URLDecoder.decode(classLoader.getResource("export/订单没有错误信息.xlsx").getPath(), "utf-8");
@@ -270,6 +272,19 @@ public class ExcelWriterTest {
         OutputStream outputStream = new FileOutputStream(file);
         workbook.write(outputStream);
         outputStream.close();
+    }
+
+    @Test
+    public void test_write_template_book() throws Exception {
+
+        Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
+                .sheetName("图书模板表").writeTemplate(Book.class);
+
+        File file = new File(bookTemplate_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+
     }
 
 }

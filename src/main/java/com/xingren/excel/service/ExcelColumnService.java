@@ -57,6 +57,7 @@ public class ExcelColumnService {
                             String strToTrue = (String) AnnotationUtil.getValue(excelColumn, ANNO_STR_TO_TRUE);
                             Boolean centToYuan = (Boolean) AnnotationUtil.getValue(excelColumn, ANNO_CENT_TO_YUAN);
                             Boolean yuanToCent = (Boolean) AnnotationUtil.getValue(excelColumn, ANNO_YUAN_TO_CENT);
+                            Boolean required = (Boolean) AnnotationUtil.getValue(excelColumn, ANNO_REQUIRED);
                             String prefix = (String) AnnotationUtil.getValue(excelColumn, ANNO_PREFIX);
                             String suffix = (String) AnnotationUtil.getValue(excelColumn, ANNO_SUFFIX);
                             Class<? extends IWriteConverter> writeConverter =
@@ -81,6 +82,7 @@ public class ExcelColumnService {
                             annoEntity.setStrToTrue(strToTrue);
                             annoEntity.setCentToYuan(centToYuan);
                             annoEntity.setYuanToCent(yuanToCent);
+                            annoEntity.setRequired(required);
                             annoEntity.setSuffix(suffix);
                             annoEntity.setPrefix(prefix);
                             try {

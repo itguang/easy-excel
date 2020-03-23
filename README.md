@@ -33,13 +33,13 @@ easy-excel 很大程度上简化了代码、让使用者更轻松的 读、写 E
 <dependency>
   <groupId>io.github.itguang</groupId>
   <artifactId>easy-excel</artifactId>
-  <version>1.0-RELEASE</version>
+  <version>1.0.2-RELEASE</version>
 </dependency>
 
 ```
 * Gradle Groovy DSL
 ```groovy
-compile group: 'io.github.itguang', name: 'easy-excel', version: '1.0-RELEASE'
+compile group: 'io.github.itguang', name: 'easy-excel', version: '1.0.2-RELEASE'
 
 ```
 

@@ -83,6 +83,11 @@ public @interface ExcelColumn {
     boolean yuanToCent() default false;
 
     /**
+     * 是否必须 (导入使用)
+     */
+    boolean required() default false;
+
+    /**
      * 导出转换器
      */
     Class<? extends IWriteConverter> writeConverter() default DefaultWriteConverter.class;

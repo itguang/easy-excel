@@ -9,6 +9,7 @@ import com.xingren.excel.pojo.RowEntity;
 import com.xingren.excel.service.ExcelColumnService;
 import com.xingren.excel.util.DateUtil;
 import com.xingren.excel.util.ReflectorUtil;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.formula.functions.T;
 import org.apache.poi.ss.usermodel.Cell;
@@ -50,10 +51,8 @@ public class ExcelReadService {
         for (RowEntity rowEntity : rowEntityList) {
             T rowObj = (T) ReflectorUtil.reflateInstance(clazz);
             for (CellEntity cellEntity : rowEntity.getCellEntityList()) {
-                if (!cellEntity.getCell().toString().equals("")) {
-                    ExcelColumnAnnoEntity annoEntity = columnNameAnnoEntityMap.get(cellEntity.getCellName());
-                    parseColumnEntityToRowObj(annoEntity, rowObj, cellEntity);
-                }
+                ExcelColumnAnnoEntity annoEntity = columnNameAnnoEntityMap.get(cellEntity.getCellName());
+                parseColumnEntityToRowObj(annoEntity, rowObj, cellEntity);
             }
             rowDataList.add(rowObj);
         }
@@ -63,7 +62,7 @@ public class ExcelReadService {
     private <T> void parseColumnEntityToRowObj(ExcelColumnAnnoEntity annoEntity, T rowObj, CellEntity cellEntity) {
         Map<String, Method> fieldNameSetMethodMap = reflectorUtil.getSetMethods();
 
-        // 如果在 Excel 中的字段在 POJO 中没有相应注解,跳过设值
+        // 如果在 Excel 中的字段在 POJO 中没有相应注解,跳过赋值
         if (null == annoEntity) {
             return;
         }
@@ -72,7 +71,7 @@ public class ExcelReadService {
         Class<?> fieldType = annoEntity.getField().getType();
         if (null != annoEntity.getReadConverter()) {
             Object fieldValue = annoEntity.getReadConverter().convert(annoEntity, clazz, columnValue, rowObj);
-            invokeSetMethod(rowObj, setMethod, fieldValue, fieldType);
+            invokeSetMethod(rowObj, setMethod, fieldValue, fieldType, annoEntity, columnValue);
             return;
         }
         // 前缀/后缀处理
@@ -81,7 +80,7 @@ public class ExcelReadService {
                     annoEntity.getPrefix().length() + columnValue.length() - annoEntity.getSuffix().length());
         }
         if (String.class.equals(fieldType)) {
-            invokeSetMethod(rowObj, setMethod, columnValue, fieldType);
+            invokeSetMethod(rowObj, setMethod, columnValue, fieldType, annoEntity, columnValue);
             return;
         }
         // Boolean 类型处理
@@ -91,22 +90,23 @@ public class ExcelReadService {
         }
         // 元转分处理
         if (annoEntity.getYuanToCent()) {
-            processYuanToCent(rowObj, setMethod, columnValue, fieldType);
+            processYuanToCent(rowObj, setMethod, columnValue, fieldType, annoEntity);
             return;
         }
         if (Integer.class.equals(fieldType) && !annoEntity.getYuanToCent()) {
-            invokeSetMethod(rowObj, setMethod, Integer.valueOf(columnValue), fieldType);
+            invokeSetMethod(rowObj, setMethod, Integer.valueOf(columnValue), fieldType, annoEntity, columnValue);
             return;
         }
         if (Long.class.equals(fieldType) && !annoEntity.getYuanToCent()) {
-            invokeSetMethod(rowObj, setMethod, Long.valueOf(columnValue), fieldType);
+            invokeSetMethod(rowObj, setMethod, Long.valueOf(columnValue), fieldType, annoEntity, columnValue);
             return;
         }
         // 枚举处理
         if (fieldType.isEnum()) {
             // Enum 实例
             Object enumObj = new EnumReadConverter().convert(annoEntity, clazz, columnValue, rowObj);
-            invokeSetMethod(rowObj, setMethod, enumObj, fieldType);
+            invokeSetMethod(rowObj, setMethod, enumObj, fieldType, annoEntity, columnValue);
+            return;
         }
         // OffsetDateTime 处理
         if (OffsetDateTime.class.equals(fieldType)) {
@@ -118,7 +118,7 @@ public class ExcelReadService {
                 } else {
                     offsetDateTime = DateUtil.parseToOffsetDateTime(columnValue, annoEntity.getDatePattern());
                 }
-                invokeSetMethod(rowObj, setMethod, offsetDateTime, fieldType);
+                invokeSetMethod(rowObj, setMethod, offsetDateTime, fieldType, annoEntity, columnValue);
             }
             return;
         }
@@ -131,7 +131,8 @@ public class ExcelReadService {
             } else {
                 localDateTime = DateUtil.parseToLocalDateTime(columnValue, annoEntity.getDatePattern());
             }
-            invokeSetMethod(rowObj, setMethod, localDateTime, fieldType);
+            invokeSetMethod(rowObj, setMethod, localDateTime, fieldType, annoEntity, columnValue);
+            return;
         }
     }
 
@@ -140,40 +141,77 @@ public class ExcelReadService {
         String strToFalse = annoEntity.getStrToFalse();
         String strToTrue = annoEntity.getStrToTrue();
         if (StringUtils.isNotEmpty(strToFalse) && columnValue.equals(strToFalse) || "false".equals(columnValue)) {
-            invokeSetMethod(rowObj, setMethod, Boolean.FALSE, fieldType);
+            invokeSetMethod(rowObj, setMethod, Boolean.FALSE, fieldType, annoEntity, columnValue);
             return;
         }
         if (StringUtils.isNotEmpty(strToTrue) && columnValue.equals(strToTrue) || "true".equals(columnValue)) {
-            invokeSetMethod(rowObj, setMethod, Boolean.TRUE, fieldType);
+            invokeSetMethod(rowObj, setMethod, Boolean.TRUE, fieldType, annoEntity, columnValue);
             return;
         }
     }
 
-    private <T> void processYuanToCent(T rowObj, Method setMethod, String columnValue, Class<?> fieldType) {
+    private <T> void processYuanToCent(T rowObj, Method setMethod, String columnValue, Class<?> fieldType,
+                                       ExcelColumnAnnoEntity annoEntity) {
+        if (StringUtils.isBlank(columnValue)) {
+            return;
+        }
         Double doubleValue = Double.valueOf(columnValue) * 100;
         if (Integer.class.equals(fieldType)) {
             Integer intValue = doubleValue.intValue();
-            invokeSetMethod(rowObj, setMethod, intValue, fieldType);
+            invokeSetMethod(rowObj, setMethod, intValue, fieldType, annoEntity, columnValue);
 
         }
         if (Long.class.equals(fieldType)) {
             Long longValue = doubleValue.longValue();
-            invokeSetMethod(rowObj, setMethod, longValue, fieldType);
+            invokeSetMethod(rowObj, setMethod, longValue, fieldType, annoEntity, columnValue);
         }
     }
 
-    private <T> void invokeSetMethod(T rowObj, Method setMethod, Object setValue, Class<?> setClass) {
+    private <T> void invokeSetMethod(T rowObj, Method setMethod, Object setValue, Class<?> setClass,
+                                     ExcelColumnAnnoEntity annoEntity, String columnValue) {
         try {
+            Class<?> fieldType = annoEntity.getField().getType();
+            // required 为 true 处理
+            if (annoEntity.getRequired()) {
+                // 枚举值不合法
+                if (fieldType.isEnum() && StringUtils.isNotBlank(columnValue)) {
+                    throw new ExcelException("枚举值[" + columnValue + "]不合法");
+                }
+                // 空值
+                if (ObjectUtils.isEmpty(setValue) || "".equals(setValue)) {
+                    throw new ExcelException("[" + annoEntity.getColumnName() + "]不能为空");
+                }
+
+            } else {
+                // required 为 false 处理
+                // 如果是枚举类型
+                if (fieldType.isEnum()) {
+                    if (null == setValue && StringUtils.isNotBlank(columnValue)) {
+                        throw new ExcelException("枚举值[" + columnValue + "]不合法");
+                    }
+                    if (null == setValue) {
+                        return;
+                    }
+                }
+            }
             ReflectorUtil.invokeSetMethod(rowObj, setMethod, setValue, setClass);
         } catch (Exception e) {
             // 是否需要出错信息进行捕获
-            if (rowObj instanceof ErrorInfoRow) {
-                ErrorInfoRow errorRow = (ErrorInfoRow) rowObj;
-                errorRow.setErrorInfo(e.getMessage() + "\n") ;
+            if (isErrorInfoRow(rowObj)) {
+                setErrotInfo((ErrorInfoRow) rowObj, e.getMessage());
+                e.printStackTrace();
             } else {
                 throw new ExcelException(e.getMessage());
             }
         }
+    }
+
+    private <T> void setErrotInfo(ErrorInfoRow rowObj, String errorInfo) {
+        rowObj.setErrorInfo(errorInfo + "\n");
+    }
+
+    private <T> boolean isErrorInfoRow(T rowObj) {
+        return rowObj instanceof ErrorInfoRow;
     }
 
     private Map<String, ExcelColumnAnnoEntity> getColumnAnnoEntityMap() {

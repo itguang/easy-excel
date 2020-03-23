@@ -64,7 +64,6 @@ public class ExcelReader {
     }
 
     public <T> List<T> toPojo(Class<T> clazz) {
-        List<T> rowDataList = null;
         Sheet sheet = workbook.getSheetAt(sheetNum);
         int lastRowIndex = sheet.getLastRowNum();
         Row columnTitleRow = sheet.getRow(columnNameRowNum++);
@@ -74,12 +73,11 @@ public class ExcelReader {
         }
 
         String[] columnNames = getColumnNames(columnTitleRow);
-
         ArrayList<RowEntity> rowEntityList = new ArrayList<>();
         for (int rowNum = columnNameRowNum; rowNum <= lastRowIndex; rowNum++) {
             List<CellEntity> cellEntityList = new ArrayList<>();
             Row row = sheet.getRow(rowNum);
-            for (int curCellNum = row.getFirstCellNum(); curCellNum < row.getLastCellNum(); curCellNum++) {
+            for (int curCellNum = 0; curCellNum < columnNames.length - 1; curCellNum++) {
                 String columnName = columnNames[curCellNum];
                 Cell cell = row.getCell(curCellNum);
                 // 先统一转换成 String 类型的值,后面再根据 pojo 对应的字段类型进项转换
@@ -89,8 +87,7 @@ public class ExcelReader {
             }
             rowEntityList.add(new RowEntity(cellEntityList));
         }
-        rowDataList = ExcelReadService.forClass(clazz).parseRowEntity(rowEntityList);
-
+        List<T> rowDataList = ExcelReadService.forClass(clazz).parseRowEntity(rowEntityList);
         return rowDataList;
     }
 

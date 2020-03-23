@@ -37,6 +37,7 @@ public interface ExcelConstant {
     String ANNO_STR_TO_FALSE = "strToFalse";
     String ANNO_CENT_TO_YUAN = "centToYuan";
     String ANNO_YUAN_TO_CENT = "yuanToCent";
+    String ANNO_REQUIRED = "required";
     String ANNO_SUFFIX = "suffix";
     String ANNO_PREFIX = "prefix";
 

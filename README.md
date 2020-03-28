@@ -165,6 +165,7 @@ public void test_import_xlsx() throws FileNotFoundException {
 | columnName                 | xcel 每一列的名称                                            |
 | index                      | 排序(仅对导出有效),支持不连续的整数                          |
 | datePattern                | 日期格式,默认: yyyy/MM/dd,只支持 OffsetDateTime和 LocalDateTime |
+| required                    | 是否必须                            |
 | enumKey                    | 枚举导入使用的key,序列化枚举使用                             |
 | trueToStr                  | true 转换字符串(仅对导出有效)                                |
 | strToTrue                  | 字符串转 true(仅对导入有效)                                  |
@@ -172,8 +173,8 @@ public void test_import_xlsx() throws FileNotFoundException {
 | strToFalse                 | 字符串 转 false(仅对导入有效)                                |
 | prefix                     | 前缀                                                         |
 | suffix                     | 后缀                                                         |
-| centToYuan                 | 是否启用 分转元(仅对导出有效) ,仅支持 Integer 和 Long 类型   |
-| yuanToCent                  | 是否启用 元转分(仅对导入有效),仅支持 Integer 和 Long 类型    |
+| centToYuan                 | 是否启用 分转元(仅对导出有效) ,支持 Integer 和 Long 类型   |
+| yuanToCent                  | 是否启用 元转分(仅对导入有效),支持 Integer 和 Long 类型    |
 | writeConverter             | 导出转换器                                                   |
 | readConverter              | 导入转换器                                                   |
 | cellStyleHandler           | rowData 样式处理器                                           |

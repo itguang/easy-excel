@@ -12,10 +12,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.xingren.excel.ExcelConstant.*;
@@ -39,6 +36,16 @@ public class ExcelWriter {
      * sheetName
      */
     private String sheetName = DEFAULT_SHEET_NAME;
+
+    /**
+     * workBook 中所有的 sheetName
+     */
+    private LinkedList<String> sheetNames = new LinkedList<>();
+
+    /**
+     * sheet 个数
+     */
+    private Integer sheetIndex = 0;
 
     /**
      * 默认激活第一个 sheet
@@ -77,6 +84,34 @@ public class ExcelWriter {
         return write(rowDatas, clazz);
     }
 
+    public <T> ExcelWriter addSheetTemplate(String sheetName, String sheetHeader, Class<T> clazz) {
+        this.sheetName = sheetName;
+        this.sheetHeader = sheetHeader;
+        writeTemplate(clazz);
+        return this;
+    }
+
+    public <T> ExcelWriter addSheetTemplate(String sheetName, Class<T> clazz) {
+        this.sheetName = sheetName;
+        this.sheetHeader = null;
+        writeTemplate(clazz);
+        return this;
+    }
+
+    public <T> ExcelWriter addSheet(String sheetName, String sheetHeader, List<T> rows, Class<T> clazz) {
+        this.sheetName = sheetName;
+        this.sheetHeader = sheetHeader;
+        write(rows, clazz);
+        return this;
+    }
+
+    public <T> ExcelWriter addSheet(String sheetName, List<T> rows, Class<T> clazz) {
+        this.sheetName = sheetName;
+        this.sheetHeader = null;
+        write(rows, clazz);
+        return this;
+    }
+
     /**
      * 导出excel
      *
@@ -96,9 +131,8 @@ public class ExcelWriter {
         excelWriteService = ExcelWriteService.forClass(clazz);
 
         // 创建表格
-        Sheet sheet = workbook.createSheet(sheetName);
+        Sheet sheet = createSheet();
         sheet.autoSizeColumn(rowIndex);
-
         // 是否需要动态删除最后一列(ErrorInfoRow)
         boolean needMinusLastColumn = isNeedMinusLastColumn(rows, clazz);
 
@@ -129,6 +163,23 @@ public class ExcelWriter {
 
         workbook.setActiveSheet(activeSheet);
         return workbook;
+    }
+
+    /**
+     * 创建一个新 sheet
+     *
+     * @return 新的 sheet 对象
+     */
+    private Sheet createSheet() {
+        sheetIndex = sheetIndex + 1;
+        if (StringUtils.isBlank(sheetName)) {
+            throw new ExcelException("第 " + sheetIndex + " 个 sheetName 不能为空");
+        }
+        if (sheetNames.contains(sheetName)) {
+            throw new ExcelException("当前 workbook 已经包含了一个 sheet 名为: '" + sheetName + "'");
+        }
+        sheetNames.add(sheetName);
+        return workbook.createSheet(sheetName);
     }
 
     private <T> boolean isNeedMinusLastColumn(List<T> rows, Class<T> clazz) {
@@ -288,4 +339,7 @@ public class ExcelWriter {
         return sheetHeader;
     }
 
+    public Workbook getWorkbook() {
+        return workbook;
+    }
 }

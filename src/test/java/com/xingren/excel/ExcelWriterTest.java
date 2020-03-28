@@ -3,6 +3,7 @@ package com.xingren.excel;
 import com.xingren.excel.entity.*;
 import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.exception.ExcelConvertException;
+import com.xingren.excel.exception.ExcelException;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.service.ExcelColumnService;
 import org.apache.commons.lang3.StringUtils;
@@ -31,6 +32,8 @@ public class ExcelWriterTest {
     static String orderTemplate_XLSX;
     static String orderWithErrorInfo_XLSX;
     static String orderNoErrorInfo_XLSX;
+    static String MULTI_SHEET_TEMPLATE_XLSX;
+    static String MULTI_SHEET_XLSX;
 
     @BeforeClass
     public static void before() throws UnsupportedEncodingException {
@@ -44,6 +47,9 @@ public class ExcelWriterTest {
         orderTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/订单模板表.xlsx").getPath(), "utf-8");
         orderWithErrorInfo_XLSX = URLDecoder.decode(classLoader.getResource("export/订单错误信息.xlsx").getPath(), "utf-8");
         orderNoErrorInfo_XLSX = URLDecoder.decode(classLoader.getResource("export/订单没有错误信息.xlsx").getPath(), "utf-8");
+        MULTI_SHEET_TEMPLATE_XLSX = URLDecoder.decode(classLoader.getResource("export/多sheet模板导出.xlsx").getPath(),
+                "utf-8");
+        MULTI_SHEET_XLSX = URLDecoder.decode(classLoader.getResource("export/多sheet导出.xlsx").getPath(), "utf-8");
 
         Product apple = new Product(1000,
                 1000L, OffsetDateTime.now(),
@@ -285,6 +291,51 @@ public class ExcelWriterTest {
         workbook.write(outputStream);
         outputStream.close();
 
+    }
+
+    @Test
+    public void write_multi_sheet_template() throws Exception {
+
+        Workbook workbook = ExcelWriter.create().addSheetTemplate("第一个", "图书", Book.class)
+                .addSheetTemplate("第二个", OrderEntity.class)
+                .getWorkbook();
+
+        File file = new File(MULTI_SHEET_TEMPLATE_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+    }
+
+    @Test
+    public void write_multi_sheet() throws Exception {
+
+        ArrayList<OrderEntity> orders = new ArrayList<>();
+        orders.add(new OrderEntity(100, "fghjkl"));
+
+        Workbook workbook = ExcelWriter.create().addSheet("第一个", "商品数据", products, Product.class)
+                .addSheet("第二个", orders, OrderEntity.class)
+                .getWorkbook();
+
+        File file = new File(MULTI_SHEET_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+    }
+
+    @Test(expected = ExcelException.class)
+    public void write_multi_sheet_with_empty_sheet_name() throws Exception {
+
+        ArrayList<OrderEntity> orders = new ArrayList<>();
+        orders.add(new OrderEntity(100, "fghjkl"));
+
+        Workbook workbook = ExcelWriter.create().addSheet("", "商品数据", products, Product.class)
+                .addSheet("第二个", orders, OrderEntity.class)
+                .getWorkbook();
+
+        File file = new File(MULTI_SHEET_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
     }
 
 }

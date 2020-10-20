@@ -5,7 +5,6 @@ import com.xingren.excel.exception.ExcelConvertException;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.ReflectorUtil;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 /**
@@ -14,19 +13,12 @@ import java.lang.reflect.Method;
  */
 public class Cent2YuanWriteConverter implements IWriteConverter {
     @Override
-    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
-
+    public Object convert(ExcelColumnAnnoEntity entity, Object rowData) {
+        Class<?> clazz = rowData.getClass();
         Class<?> type = entity.getField().getType();
 
         Method getMethod = ReflectorUtil.fromCache(clazz).getGetMethod(entity.getFiledName());
-        Object value = null;
-        try {
-            value = getMethod.invoke(rowData);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+        Object value = ReflectorUtil.invokeGetMethod(getMethod, rowData);
 
         if (null == value) {
             return 0;

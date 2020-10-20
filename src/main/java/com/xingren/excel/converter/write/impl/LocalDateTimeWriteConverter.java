@@ -6,7 +6,6 @@ import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.DateUtil;
 import com.xingren.excel.util.ReflectorUtil;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 
@@ -16,7 +15,8 @@ import java.time.LocalDateTime;
  */
 public class LocalDateTimeWriteConverter implements IWriteConverter {
     @Override
-    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
+    public Object convert(ExcelColumnAnnoEntity entity, Object rowData) {
+        Class<?> clazz = rowData.getClass();
 
         if (!LocalDateTime.class.equals(entity.getField().getType())) {
             throw new ExcelConvertException("类 " + clazz.getName() + " 中字段:"
@@ -24,14 +24,8 @@ public class LocalDateTimeWriteConverter implements IWriteConverter {
         }
 
         Method getMethod = ReflectorUtil.fromCache(clazz).getGetMethod(entity.getFiledName());
-        LocalDateTime localDateTime = null;
-        try {
-            localDateTime = (LocalDateTime) getMethod.invoke(rowData);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
+
+        LocalDateTime localDateTime = (LocalDateTime) ReflectorUtil.invokeGetMethod(getMethod, rowData);
 
         return DateUtil.formatLocalDateTime(localDateTime, entity.getDatePattern());
     }

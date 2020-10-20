@@ -19,8 +19,8 @@ import java.util.stream.Stream;
 public class EnumWriteConverter implements IWriteConverter {
 
     @Override
-    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
-        Object value = null;
+    public Object convert(ExcelColumnAnnoEntity entity, Object rowData) {
+        Class<?> clazz = rowData.getClass();
         String filedName = entity.getFiledName();
         Method getMethod = ReflectorUtil.fromCache(clazz).getGetMethod(filedName);
 
@@ -35,10 +35,8 @@ public class EnumWriteConverter implements IWriteConverter {
         Object enumObj = null;
         try {
             enumObj = getMethod.invoke(rowData);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            throw new RuntimeException(e);
         }
 
         Method[] declaredMethods = enumClass.getDeclaredMethods();
@@ -52,14 +50,7 @@ public class EnumWriteConverter implements IWriteConverter {
                     + " 在 " + enumClass.getName() + " 不存在");
         }
 
-        try {
-            value = enumKeyMethod.get().invoke(enumObj);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return value;
+        return ReflectorUtil.invokeGetMethod(enumKeyMethod.get(), enumObj);
     }
 
 }

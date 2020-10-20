@@ -4,7 +4,9 @@ import com.xingren.excel.enums.ExcelType;
 import com.xingren.excel.exception.ExcelException;
 import com.xingren.excel.pojo.ErrorInfoRow;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
+import com.xingren.excel.pojo.TemplateRowFormat;
 import com.xingren.excel.service.ExcelColumnService;
+import com.xingren.excel.service.format.FormatterFactory;
 import com.xingren.excel.service.write.ExcelWriteService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -56,6 +58,14 @@ public class ExcelWriter {
      * 表格头
      */
     private String sheetHeader;
+    /**
+     * 表格尾巴/表格最下面的备注等
+     */
+    private String sheetTail;
+
+    private Float tailHeight = 22f;
+
+    private Boolean autoWidth = Boolean.FALSE;
 
     /**
      * Excel 文件类型
@@ -84,6 +94,14 @@ public class ExcelWriter {
         return write(rowDatas, clazz);
     }
 
+    /**
+     * 导出模板，并且格式化指定单元格的样式
+     */
+    public <T> Workbook writeTemplate(Class<T> clazz, List<TemplateRowFormat> formats) {
+        ArrayList<T> rowDatas = new ArrayList<>();
+        return write(rowDatas, clazz, formats);
+    }
+
     public <T> ExcelWriter addSheetTemplate(String sheetName, String sheetHeader, Class<T> clazz) {
         this.sheetName = sheetName;
         this.sheetHeader = sheetHeader;
@@ -95,6 +113,13 @@ public class ExcelWriter {
         this.sheetName = sheetName;
         this.sheetHeader = null;
         writeTemplate(clazz);
+        return this;
+    }
+
+    public <T> ExcelWriter addSheetTemplate(String sheetName, Class<T> clazz, List<TemplateRowFormat> formats) {
+        this.sheetName = sheetName;
+        this.sheetHeader = null;
+        writeTemplate(clazz, formats);
         return this;
     }
 
@@ -120,6 +145,18 @@ public class ExcelWriter {
      * @return workBook
      */
     public <T> Workbook write(List<T> rows, Class<T> clazz) {
+        return write(rows, clazz, Collections.emptyList());
+    }
+
+    /**
+     * 导出excel
+     *
+     * @param rows    java Entity Collection
+     * @param clazz   java Entity Class
+     * @param formats 格式化操作
+     * @return workBook
+     */
+    public <T> Workbook write(List<T> rows, Class<T> clazz, List<TemplateRowFormat> formats) {
         if (CollectionUtils.isEmpty(rows)) {
             rows = Collections.emptyList();
         }
@@ -158,8 +195,14 @@ public class ExcelWriter {
             // 样式设置
             row.setRowStyle(style);
             row.setHeightInPoints(columnDataRowHeight);
-
         }
+
+        if (StringUtils.isNotEmpty(sheetTail)) {
+            excelWriteService.addSheetTail(workbook, rowIndex, sheetTail, sheet, needMinusLastColumn, tailHeight);
+        }
+
+        // format cell
+        formats.forEach(format -> FormatterFactory.get(format.getFormatType()).format(sheet, format));
 
         workbook.setActiveSheet(activeSheet);
         return workbook;
@@ -183,7 +226,6 @@ public class ExcelWriter {
     }
 
     private <T> boolean isNeedMinusLastColumn(List<T> rows, Class<T> clazz) {
-
         // 是否继承自 isErrorInfoRow
         boolean isErrorInfoRow = isErrorInfoRow(clazz);
 
@@ -211,7 +253,9 @@ public class ExcelWriter {
             currentCell.setCellValue(cellValue);
 
             // 设置自动列宽
-            excelWriteService.autoCellWidth(sheet, columnNum, cellValue);
+            if (autoWidth) {
+                excelWriteService.autoCellWidth(sheet, columnNum, cellValue);
+            }
 
         }
     }
@@ -320,6 +364,11 @@ public class ExcelWriter {
         return this;
     }
 
+    /**
+     * 设置表格头
+     *
+     * @param sheetHeader 表格头
+     */
     public ExcelWriter sheetHeader(String sheetHeader) {
         if (StringUtils.isEmpty(sheetHeader)) {
             throw new ExcelException("sheetHeader 不能为空");
@@ -328,6 +377,33 @@ public class ExcelWriter {
         if (StringUtils.isNotEmpty(sheetHeader)) {
             this.sheetHeader = sheetHeader;
         }
+        return this;
+    }
+
+    /**
+     * 设置 表格 尾巴
+     *
+     * @param tail 表格尾巴
+     */
+    public ExcelWriter sheetTail(String tail) {
+        this.sheetTail = tail;
+        return this;
+    }
+
+    /**
+     * 设置 表格 尾巴
+     *
+     * @param tail       表格尾巴
+     * @param tailHeight 高度
+     */
+    public ExcelWriter sheetTail(String tail, Float tailHeight) {
+        this.sheetTail = tail;
+        this.tailHeight = tailHeight;
+        return this;
+    }
+
+    public ExcelWriter autoRowWidth(Boolean autoWidth) {
+        this.autoWidth = autoWidth;
         return this;
     }
 

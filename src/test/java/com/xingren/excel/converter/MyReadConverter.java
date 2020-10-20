@@ -1,6 +1,7 @@
 package com.xingren.excel.converter;
 
 import com.xingren.excel.converter.read.IReadConverter;
+import com.xingren.excel.pojo.CellEntity;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 
 /**
@@ -9,7 +10,8 @@ import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
  */
 public class MyReadConverter implements IReadConverter {
     @Override
-    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object cellValue, Object rowObj) {
+    public Object convert(ExcelColumnAnnoEntity entity, CellEntity cellEntity, Object rowObj) {
+        String cellValue = cellEntity.getCellValue();
         return "[" + cellValue + "]";
     }
 }

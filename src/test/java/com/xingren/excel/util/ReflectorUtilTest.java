@@ -3,8 +3,8 @@ package com.xingren.excel.util;
 import com.xingren.excel.annotation.ExcelColumn;
 import com.xingren.excel.entity.Product;
 import com.xingren.excel.entity.ReflectorEntity;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -12,13 +12,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ReflectorUtilTest {
     private static ReflectorUtil productReflectorUtil;
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() {
         productReflectorUtil = ReflectorUtil.fromCache(Product.class);
 

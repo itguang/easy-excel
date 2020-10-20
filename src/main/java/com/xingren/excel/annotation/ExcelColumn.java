@@ -30,7 +30,7 @@ public @interface ExcelColumn {
     /**
      * 排序(仅对导出有效)
      */
-    int index();
+    int index() default -1;
 
     /**
      * 日期格式

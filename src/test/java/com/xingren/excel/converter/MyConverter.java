@@ -8,9 +8,10 @@ import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
  * @author guang
  * @since 2020/2/11 4:24 下午
  */
-public class MyConverter implements IWriteConverter {
+public class MyConverter implements IWriteConverter<Product, String> {
+
     @Override
-    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
+    public String convert(ExcelColumnAnnoEntity entity, Product rowData) {
         Product product = (Product) rowData;
         return product.getName() + "--" + product.getOther();
     }

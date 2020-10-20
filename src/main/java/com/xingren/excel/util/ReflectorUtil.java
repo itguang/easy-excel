@@ -43,6 +43,16 @@ public final class ReflectorUtil {
         return CACHE_REFLECTOR.get(clazz);
     }
 
+    public static Object invokeGetMethod(Method getMethod, Object rowData) {
+        Object value = null;
+        try {
+            value = getMethod.invoke(rowData);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+        }
+        return value;
+    }
+
     private void addGetMethods(Class<?> cls) {
         Map<String, List<Method>> conflictingGetters = new HashMap<String, List<Method>>();
         Method[] methods = getClassMethods(cls);
@@ -392,7 +402,7 @@ public final class ReflectorUtil {
     public static <T> T reflateInstance(Class<T> clazz) {
         T newInstance = null;
         try {
-            newInstance = (T) clazz.newInstance();
+            newInstance = clazz.newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
             throw new ExcelException("类 " + clazz.toString() + " 必须得有无参构造器");
@@ -404,6 +414,9 @@ public final class ReflectorUtil {
     }
 
     public static <T> void invokeSetMethod(T rowObj, Method setMethod, Object setValue, Class<?> setClass) {
+        if (null == setValue) {
+            return;
+        }
         try {
             // 反射调用 set 方法设置 属性值
             if (setClass.isInstance(setValue)) {
@@ -411,16 +424,15 @@ public final class ReflectorUtil {
             } else {
                 throw new RuntimeException("类型不匹配! setValue= " + setValue + " ,setClass= " + setClass.getName());
             }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
+        } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
         }
     }
 
     public static void makeAccessible(Method method) {
-        if ((!Modifier.isPublic(method.getModifiers()) || !Modifier.isPublic(method.getDeclaringClass().getModifiers())) &&
-                !method.isAccessible()) {
+        if ((!Modifier.isPublic(method.getModifiers())
+                || !Modifier.isPublic(method.getDeclaringClass().getModifiers()))
+                && !method.isAccessible()) {
             method.setAccessible(true);
         }
     }

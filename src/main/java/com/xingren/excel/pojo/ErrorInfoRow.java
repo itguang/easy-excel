@@ -6,7 +6,7 @@ import com.xingren.excel.handler.impl.RedFontCellStyleHandler;
 import static com.xingren.excel.ExcelConstant.ERROR_COLUMN_NAME;
 
 /**
- * 错误信息接口
+ * 错误信息接口,如果继承此类,在导出时,处理每一行的出错信息,发生异常,都不会中断程序,而是会把错误信息,放在 errorInfo 字段中
  *
  * @author guang
  */

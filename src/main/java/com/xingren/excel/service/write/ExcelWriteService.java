@@ -2,10 +2,13 @@ package com.xingren.excel.service.write;
 
 import com.xingren.excel.ExcelConstant;
 import com.xingren.excel.annotation.ExcelColumn;
-import com.xingren.excel.converter.write.impl.*;
+import com.xingren.excel.converter.write.IWriteConverter;
+import com.xingren.excel.converter.write.WriteConverterFactory;
 import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
+import com.xingren.excel.util.POIUtil;
 import com.xingren.excel.util.ReflectorUtil;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -13,10 +16,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,7 +27,9 @@ import static com.xingren.excel.ExcelConstant.sheetHeaderRowHeight;
  */
 public class ExcelWriteService<T> {
 
-    private ReflectorUtil reflectorUtil;
+    private static final WriteConverterFactory writeConverterFactory = new WriteConverterFactory();
+
+    private final ReflectorUtil reflectorUtil;
 
     private Class<T> clazz;
 
@@ -41,73 +42,37 @@ public class ExcelWriteService<T> {
         return new ExcelWriteService(clazz);
     }
 
-    public Object parseFieldValue(Object rowData, ExcelColumnAnnoEntity entity, Cell cell) {
-        String filedName = entity.getFiledName();
-        Method getMethod = reflectorUtil.getGetMethod(filedName);
-        Class<?> type = entity.getField().getType();
+    public Object parseFieldValue(Object rowData, ExcelColumnAnnoEntity annoEntity, Cell cell) {
 
-        if (null != entity.getWriteConverter()) {
-            Object value = entity.getWriteConverter().convert(entity, clazz, rowData);
-            return entity.getPrefix() + value + entity.getSuffix();
-        }
+        IWriteConverter converter = writeConverterFactory.getConverter(annoEntity);
+        Object value = converter.convert(annoEntity, rowData);
 
-        // Enum 类型处理
-        if (type.isEnum()) {
-            Object value = new EnumWriteConverter().convert(entity, clazz, rowData);
-            return entity.getPrefix() + value + entity.getSuffix();
+        // 前后缀处理
+        if (StringUtils.isNotEmpty(annoEntity.getPrefix())) {
+            value = annoEntity.getPrefix() + value;
         }
-        // OffsetDateTime 类型处理
-        if (OffsetDateTime.class.equals(type)) {
-            Object value = new OffSetDateTimeWriteConverter().convert(entity, clazz, rowData);
-            return entity.getPrefix() + value + entity.getSuffix();
+        // 后缀处理
+        if (StringUtils.isNotEmpty(annoEntity.getSuffix())) {
+            value = value + annoEntity.getSuffix();
         }
-        // LocalDateTime 类型处理
-        if (LocalDateTime.class.equals(type)) {
-            Object value = new LocalDateTimeWriteConverter().convert(entity, clazz, rowData);
-            return entity.getPrefix() + value + entity.getSuffix();
-        }
-        // Boolean 类型处理
-        if (Boolean.class.equals(type)) {
-            Object value = new BooleanWriteConverter().convert(entity, clazz, rowData);
-            return entity.getPrefix() + value + entity.getSuffix();
-        }
-        // Integer 和 Long 类型的 分转元处理
-        if (entity.getCentToYuan()) {
-            Object value = new Cent2YuanWriteConverter().convert(entity, clazz, rowData);
-            return entity.getPrefix() + value + entity.getSuffix();
-        }
-
-        try {
-            Object value = getMethod.invoke(rowData);
-            if (null == value) {
-                return null;
-            }
-            return entity.getPrefix() + value + entity.getSuffix();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
-        }
-        return null;
-
+        return value;
     }
 
     private List<Field> filterExcelField(List<Field> fieldList) {
         // 过滤出 注解 @ExcelColumn 的字段
-        List<Field> excelColumnFields = fieldList.stream()
+        return fieldList.stream()
                 .filter(field -> field.isAnnotationPresent(ExcelColumn.class)
                 ).collect(Collectors.toList());
-        return excelColumnFields;
     }
 
     public void createSheetHeader(Workbook workbook, int rowIndex, String sheetHeader, Sheet sheet,
                                   boolean needMinusLastColumn) {
-        List<Field> excelField = filterExcelField(reflectorUtil.getFieldList());
+        List<Field> excelFields = filterExcelField(reflectorUtil.getFieldList());
 
-        if (CollectionUtils.isEmpty(excelField)) {
+        if (CollectionUtils.isEmpty(excelFields)) {
             sheet.addMergedRegion(new CellRangeAddress(0, 0, 0, 0));
         } else {
-            int lastCol = excelField.size() - 1;
+            int lastCol = excelFields.size() - 1;
             if (needMinusLastColumn) {
                 lastCol = lastCol - 1;
             }
@@ -118,7 +83,6 @@ public class ExcelWriteService<T> {
         header.setCellValue(sheetHeader);
         header.setCellStyle(ExcelConstant.defaultHeaderRowStyle(workbook));
         row0.setHeightInPoints(sheetHeaderRowHeight);
-
         // 自动列宽
         autoCellWidth(sheet, rowIndex, sheetHeader);
     }
@@ -136,4 +100,26 @@ public class ExcelWriteService<T> {
         sheet.setColumnWidth(columnNum, columnWidth * 256);
     }
 
+    public void addSheetTail(Workbook workbook, int lastRowIndex, String sheetTail, Sheet sheet,
+                             boolean needMinusLastColumn, Float tailHeight) {
+        int insertRowIndex = lastRowIndex + 1;
+        List<Field> excelFields = filterExcelField(reflectorUtil.getFieldList());
+        if (CollectionUtils.isEmpty(excelFields)) {
+            sheet.addMergedRegion(new CellRangeAddress(insertRowIndex, insertRowIndex, 0, 0));
+        } else {
+            int lastCol = excelFields.size() - 1;
+            if (needMinusLastColumn) {
+                lastCol = lastCol - 1;
+            }
+            sheet.addMergedRegion(new CellRangeAddress(insertRowIndex, insertRowIndex, 0, lastCol));
+        }
+
+        Row row0 = sheet.createRow(insertRowIndex);
+        Cell header = row0.createCell(0);
+        header.setCellValue(sheetTail);
+        header.setCellStyle(ExcelConstant.defaultTailRowStyle(workbook));
+
+        Float hieght = POIUtil.getExcelCellAutoHeight(sheetTail + "", tailHeight);
+        row0.setHeightInPoints(hieght);
+    }
 }

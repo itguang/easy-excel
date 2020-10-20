@@ -9,7 +9,7 @@ import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
  */
 public class DefaultWriteConverter implements IWriteConverter {
     @Override
-    public Object convert(ExcelColumnAnnoEntity entity, Class<?> clazz, Object rowData) {
+    public Object convert(ExcelColumnAnnoEntity entity, Object rowData) {
         throw new UnsupportedOperationException("该类属于注解默认参数,不可实例化");
     }
 }

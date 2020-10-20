@@ -48,7 +48,7 @@ public class ExcelReader implements Closeable {
             }
             this.sheetSize = workbook.getNumberOfSheets();
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new ExcelException("WorkBook 读取文件异常:" + e);
         }
     }
 
@@ -99,6 +99,12 @@ public class ExcelReader implements Closeable {
         return rowDataList;
     }
 
+    /**
+     * @param sheetNum         读取第几个 sheet,从 0开始
+     * @param columnNameRowNum column name 所在行, 从 0 开始
+     * @param clazz            要转成的 POJO 类型
+     * @return
+     */
     public <T> List<T> toPojo(Integer sheetNum, Integer columnNameRowNum, Class<T> clazz) {
         this.sheetNum = sheetNum;
         this.columnNameRowNum = columnNameRowNum;
@@ -122,10 +128,10 @@ public class ExcelReader implements Closeable {
 
     private void check() {
         if (sheetNum < 0 || sheetNum >= sheetSize) {
-            throw new InvalidParameterException("非法的sheetNum：" + sheetNum);
+            throw new InvalidParameterException("非法的 sheetNum ：" + sheetNum);
         }
         if (columnNameRowNum < 0) {
-            throw new InvalidParameterException("非法的columnNameRowNum：" + columnNameRowNum);
+            throw new InvalidParameterException("非法的 columnNameRowNum ：" + columnNameRowNum);
         }
     }
 }

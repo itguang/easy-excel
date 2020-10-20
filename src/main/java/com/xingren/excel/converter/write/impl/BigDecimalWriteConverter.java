@@ -6,33 +6,25 @@ import com.xingren.excel.pojo.ExcelColumnAnnoEntity;
 import com.xingren.excel.util.ReflectorUtil;
 
 import java.lang.reflect.Method;
+import java.math.BigDecimal;
 
 /**
  * @author guang
- * @since 2020/2/8 4:51 下午
+ * @since 2020/9/7 3:24 下午
  */
-public class BooleanWriteConverter implements IWriteConverter {
+public class BigDecimalWriteConverter implements IWriteConverter<Object, BigDecimal> {
     @Override
-    public Object convert(ExcelColumnAnnoEntity entity, Object rowData) {
+    public BigDecimal convert(ExcelColumnAnnoEntity entity, Object rowData) {
         Class<?> clazz = rowData.getClass();
-        if (!Boolean.class.equals(entity.getField().getType())) {
+        if (!BigDecimal.class.equals(entity.getField().getType())) {
             throw new ExcelConvertException("类 " + clazz.getName() + " 中字段:"
-                    + entity.getFiledName() + " 不是 Boolean 类型!");
+                    + entity.getFiledName() + " 不是 BigDecimal 类型!");
         }
-
         Method getMethod = ReflectorUtil.fromCache(clazz).getGetMethod(entity.getFiledName());
-        Boolean b = (Boolean) ReflectorUtil.invokeGetMethod(getMethod, rowData);
-
-        if (null == b) {
+        BigDecimal bigDecimal = (BigDecimal) ReflectorUtil.invokeGetMethod(getMethod, rowData);
+        if (null == bigDecimal) {
             return null;
         }
-
-        if (b) {
-            return entity.getTrueStr();
-        } else {
-            return entity.getFalseStr();
-        }
-
+        return bigDecimal;
     }
-
 }

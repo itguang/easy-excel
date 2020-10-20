@@ -88,6 +88,21 @@ public interface ExcelConstant {
     }
 
     /**
+     * 默认的 Excel Tail 样式
+     */
+    static CellStyle defaultTailRowStyle(Workbook workbook) {
+        CellStyle headerCellStyle = workbook.createCellStyle();
+        headerCellStyle.setAlignment(HorizontalAlignment.LEFT);
+        headerCellStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+        headerCellStyle.setWrapText(true);
+        Font font = workbook.createFont();
+        font.setFontName(DEFAULT_FONT_NAME);
+        font.setBold(false);
+        headerCellStyle.setFont(font);
+        return headerCellStyle;
+    }
+
+    /**
      * 默认的 Excel ColumnName 样式
      */
     static CellStyle defaultColumnNameStyle(Workbook workbook) {

@@ -9,7 +9,7 @@ plugins {
 group 'com.xingren'
 version '1.0.2-RELEASE'
 
-sourceCompatibility = 11
+sourceCompatibility = 1.8
 
 // 指定本地上传的路径
 def localMavenRepo = 'file://' + new File(System.getProperty('user.home'), '.m2/repository').absolutePath

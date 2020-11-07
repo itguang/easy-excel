@@ -48,6 +48,9 @@ public class ExcelWriterTest {
     static String multi_sheet_XLSX;
     static String format_employ_sheet_XLSX;
 
+    static ArrayList<SimpleProduct> simpleProducts;
+    static ArrayList<Product> products_1w;
+
     public ExcelWriterTest() throws UnsupportedEncodingException {
         ClassLoader classLoader = ExcelWriterTest.class.getClassLoader();
         productFile_XLS = URLDecoder.decode(classLoader.getResource("export/导出商品数据.xls").getPath(), "utf-8");
@@ -81,10 +84,27 @@ public class ExcelWriterTest {
                 2000L, OffsetDateTime.now().minusDays(1),
                 "橘子", false, StateEnum.UP,
                 LocalDateTime.now().minusDays(1), "好酸");
-
         products = new ArrayList<>();
         products.add(apple);
         products.add(orange);
+
+        simpleProducts = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            SimpleProduct simpleProduct = new SimpleProduct(i,
+                    1000L, "2020-01-01",
+                    "苹果" + i, "是", StateEnum.DOWN.getName(), "2020-08-08",
+                    "好吃" + i, "");
+            simpleProducts.add(simpleProduct);
+        }
+
+        products_1w = new ArrayList<>();
+        for (int i = 0; i < 10000; i++) {
+            Product pp = new Product(i,
+                    1000L, OffsetDateTime.now(),
+                    "苹果" + i, true, StateEnum.DOWN, LocalDateTime.now(),
+                    "好吃" + i);
+            products_1w.add(pp);
+        }
 
     }
 
@@ -256,34 +276,24 @@ public class ExcelWriterTest {
     @DisplayName(" 1w 行数据导出测试")
     public void test_export_1w_xlsx() throws IOException {
 
-        ArrayList<Product> products = new ArrayList<>();
-
-        for (int i = 0; i < 10000; i++) {
-            Product apple = new Product(i,
-                    1000L, OffsetDateTime.now(),
-                    "苹果" + i, true, StateEnum.DOWN, LocalDateTime.now(),
-                    "好吃" + i);
-            products.add(apple);
-        }
-
         Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
                 .sheetName("商品数据")
                 .sheetHeader("--2月份商品数据--")
                 .activeSheet(0)
-                .write(products, Product.class);
+                .write(products_1w, Product.class);
 
-//        File file = new File(productFile_XLSX);
-//        OutputStream outputStream = new FileOutputStream(file);
-//        workbook.write(outputStream);
-//        outputStream.close();
-//
-//        FileInputStream fileInputStream = new FileInputStream(file);
-//        List<Product> list = ExcelReader.read(fileInputStream)
-//                .columnNameRowNum(1)
-//                .toPojo(Product.class);
-//        assertEquals(10000, list.size());
-//
-//        fileInputStream.close();
+        File file = new File(productFile_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
+
+        FileInputStream fileInputStream = new FileInputStream(file);
+        List<Product> list = ExcelReader.read(fileInputStream)
+                .columnNameRowNum(1)
+                .toPojo(Product.class);
+        assertEquals(10000, list.size());
+
+        fileInputStream.close();
 
     }
 
@@ -294,34 +304,24 @@ public class ExcelWriterTest {
     @DisplayName(" 1w 行简单类型数据导出测试")
     public void test_export_1w_simple_xlsx() throws IOException {
 
-        ArrayList<SimpleProduct> products = new ArrayList<>();
-
-        for (int i = 0; i < 10000; i++) {
-            SimpleProduct apple = new SimpleProduct(i,
-                    1000L, "2020-01-01",
-                    "苹果" + i, "是", StateEnum.DOWN.getName(), "2020-08-08",
-                    "好吃" + i, "");
-            products.add(apple);
-        }
-
         Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
                 .sheetName("商品数据")
                 .sheetHeader("--2月份商品数据--")
                 .activeSheet(0)
-                .write(products, SimpleProduct.class);
+                .write(simpleProducts, SimpleProduct.class);
 
-//        File file = new File(simpleProductFile_XLSX);
-//        OutputStream outputStream = new FileOutputStream(file);
-//        workbook.write(outputStream);
-//        outputStream.close();
-//
-//        FileInputStream fileInputStream = new FileInputStream(file);
-//        List<SimpleProduct> list = ExcelReader.read(fileInputStream)
-//                .columnNameRowNum(1)
-//                .toPojo(SimpleProduct.class);
-//        assertEquals(10000, list.size());
+        File file = new File(simpleProductFile_XLSX);
+        OutputStream outputStream = new FileOutputStream(file);
+        workbook.write(outputStream);
+        outputStream.close();
 
-//        fileInputStream.close();
+        FileInputStream fileInputStream = new FileInputStream(file);
+        List<SimpleProduct> list = ExcelReader.read(fileInputStream)
+                .columnNameRowNum(1)
+                .toPojo(SimpleProduct.class);
+        assertEquals(10000, list.size());
+
+        fileInputStream.close();
 
     }
 

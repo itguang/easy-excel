@@ -105,7 +105,6 @@ public class DateUtil {
         Date date = null;
         try {
             date = simpleDateFormat.parse(text);
-            System.out.println(date);
         } catch (ParseException e) {
             e.printStackTrace();
         }

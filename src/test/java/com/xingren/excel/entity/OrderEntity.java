@@ -4,6 +4,7 @@ import com.xingren.excel.annotation.ExcelColumn;
 import com.xingren.excel.pojo.ErrorInfoRow;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 /**
@@ -12,6 +13,7 @@ import lombok.NoArgsConstructor;
  */
 @AllArgsConstructor
 @NoArgsConstructor
+@EqualsAndHashCode(callSuper=false)
 @Data
 public class OrderEntity extends ErrorInfoRow {
 

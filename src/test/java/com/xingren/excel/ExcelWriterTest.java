@@ -37,6 +37,7 @@ public class ExcelWriterTest {
     static String productFile_with_tail_XLS;
     static String productNoHeaderFile_XLS;
     static String productFile_XLSX;
+    static String simpleProductFile_XLSX;
     static String productEmptyFile_XLSX;
     static String employeeTemplate_XLSX;
     static String bookTemplate_XLSX;
@@ -50,14 +51,20 @@ public class ExcelWriterTest {
     public ExcelWriterTest() throws UnsupportedEncodingException {
         ClassLoader classLoader = ExcelWriterTest.class.getClassLoader();
         productFile_XLS = URLDecoder.decode(classLoader.getResource("export/导出商品数据.xls").getPath(), "utf-8");
-        productFile_with_tail_XLS = URLDecoder.decode(classLoader.getResource("export/导出商品数据(tail).xls").getPath(),
-                "utf" +
-                        "-8");
-        productNoHeaderFile_XLS = URLDecoder.decode(classLoader.getResource("export/no_header.xls").getPath(), "utf-8");
-        productFile_XLSX = URLDecoder.decode(classLoader.getResource("export/导出商品数据_1w.xlsx").getPath(), "utf-8");
-        productEmptyFile_XLSX = URLDecoder.decode(classLoader.getResource("export/空的商品数据.xlsx").getPath(), "utf-8");
-        employeeTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/员工模板表.xlsx").getPath(), "utf-8");
-        bookTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/图书模板表.xlsx").getPath(), "utf-8");
+        productFile_with_tail_XLS = URLDecoder.decode(
+                classLoader.getResource("export/导出商品数据(tail).xls").getPath(), "utf-8");
+        productNoHeaderFile_XLS = URLDecoder.decode(
+                classLoader.getResource("export/no_header.xls").getPath(), "utf-8");
+        productFile_XLSX = URLDecoder.decode(classLoader.getResource("export/导出商品数据_1w.xlsx").getPath(),
+                "utf-8");
+        simpleProductFile_XLSX = URLDecoder.decode(
+                classLoader.getResource("export/导出商品简单数据_1w.xlsx").getPath(), "utf-8");
+        productEmptyFile_XLSX = URLDecoder.decode(classLoader.getResource("export/空的商品数据.xlsx").getPath(),
+                "utf-8");
+        employeeTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/员工模板表.xlsx").getPath(),
+                "utf-8");
+        bookTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/图书模板表.xlsx").getPath(),
+                "utf-8");
         orderTemplate_XLSX = URLDecoder.decode(classLoader.getResource("export/订单模板表.xlsx").getPath(), "utf-8");
         orderWithErrorInfo_XLSX = URLDecoder.decode(classLoader.getResource("export/订单错误信息.xlsx").getPath(), "utf-8");
         orderNoErrorInfo_XLSX = URLDecoder.decode(classLoader.getResource("export/订单没有错误信息.xlsx").getPath(), "utf-8");
@@ -265,18 +272,56 @@ public class ExcelWriterTest {
                 .activeSheet(0)
                 .write(products, Product.class);
 
-        File file = new File(productFile_XLSX);
-        OutputStream outputStream = new FileOutputStream(file);
-        workbook.write(outputStream);
-        outputStream.close();
+//        File file = new File(productFile_XLSX);
+//        OutputStream outputStream = new FileOutputStream(file);
+//        workbook.write(outputStream);
+//        outputStream.close();
+//
+//        FileInputStream fileInputStream = new FileInputStream(file);
+//        List<Product> list = ExcelReader.read(fileInputStream)
+//                .columnNameRowNum(1)
+//                .toPojo(Product.class);
+//        assertEquals(10000, list.size());
+//
+//        fileInputStream.close();
 
-        FileInputStream fileInputStream = new FileInputStream(file);
-        List<Product> list = ExcelReader.read(fileInputStream)
-                .columnNameRowNum(1)
-                .toPojo(Product.class);
-        assertEquals(10000, list.size());
+    }
 
-        fileInputStream.close();
+    /**
+     * 10000 行数据导出测试 7s 需要优化
+     */
+    @Test
+    @DisplayName(" 1w 行简单类型数据导出测试")
+    public void test_export_1w_simple_xlsx() throws IOException {
+
+        ArrayList<SimpleProduct> products = new ArrayList<>();
+
+        for (int i = 0; i < 10000; i++) {
+            SimpleProduct apple = new SimpleProduct(i,
+                    1000L, "2020-01-01",
+                    "苹果" + i, "是", StateEnum.DOWN.getName(), "2020-08-08",
+                    "好吃" + i, "");
+            products.add(apple);
+        }
+
+        Workbook workbook = ExcelWriter.create(ExcelType.XLSX)
+                .sheetName("商品数据")
+                .sheetHeader("--2月份商品数据--")
+                .activeSheet(0)
+                .write(products, SimpleProduct.class);
+
+//        File file = new File(simpleProductFile_XLSX);
+//        OutputStream outputStream = new FileOutputStream(file);
+//        workbook.write(outputStream);
+//        outputStream.close();
+//
+//        FileInputStream fileInputStream = new FileInputStream(file);
+//        List<SimpleProduct> list = ExcelReader.read(fileInputStream)
+//                .columnNameRowNum(1)
+//                .toPojo(SimpleProduct.class);
+//        assertEquals(10000, list.size());
+
+//        fileInputStream.close();
 
     }
 

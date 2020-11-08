@@ -549,10 +549,11 @@ public class ExcelWriterTest {
     public void test_export_format_template() throws IOException {
         List<TemplateRowFormat> formats = new ArrayList<>();
         TemplateRowFormat format = new TemplateRowFormat(2, 4, 2, 4);
-        format.setFormatType(DROP_DOWN_LIST);
         List<String> genders = Stream.of(Gender.values()).map(Gender::getName).collect(toList());
         String[] genderArr = new String[genders.size()];
         genders.toArray(genderArr);
+
+        format.setFormatType(DROP_DOWN_LIST);
         format.setData(genderArr);
         formats.add(format);
 
